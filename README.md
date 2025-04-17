@@ -23,7 +23,7 @@ There are three variants of the NiosV core:
     c. Nios V/c core - Compact Microcontroller- Smallest (For non-interrupt driven baremetal code)
 
 
-The following table contains the list of the designs on Agilex 5 FPGA E-Series 065B Premium Development Kit
+The following table contains the list of the designs on Agilex™ 3 FPGA C-Series 135 (M16A) A3CW135BM16AE6S
 
 | # | Nios V core | Design name | Description |
 | - | --- | ------ | ----------- |
