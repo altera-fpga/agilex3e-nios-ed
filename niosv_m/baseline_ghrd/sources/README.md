@@ -24,12 +24,12 @@ The objective of the design is to accomplish data transfer between the processor
 * **Design Package**: agilex3_niosv_m_baseline_ghrd.zip
 * **Category**: GHRD
 * **URL**: https://github.com/altera-fpga/agilex3e-nios-ed/tree/rel/25.1.0/niosv_m/baseline_ghrd
-* **downloadURL**: https://github.com/altera-fpga/agilex5e-nios-ed/releases/download/25.1.0-v1.0/agilex5_niosv_m_baseline_ghrd.zip
+* **downloadURL**: https://github.com/altera-fpga/agilex3e-nios-ed/releases/download/25.1.0-v1.0/agilex3_niosv_m_baseline_ghrd.zip
 
 ## Documentation
 
 * **Title**: Design Document
-* **URL**: https://github.com/altera-fpga/agilex5e-nios-ed/blob/rel/25.1.0/niosv_m/niosv_m_baseline_ghrd/docs/NiosV_m_Processor_baseline_ghrd_on_Agilex_5_FPGA.md
+* **URL**: https://github.com/altera-fpga/agilex3e-nios-ed/blob/rel/25.1.0/niosv_m/baseline_ghrd/docs/Nios_Vm_Processor_Baseline_GHRD_Design_on_Agilex_3_FPGA.md
 
 # Getting Started
 
