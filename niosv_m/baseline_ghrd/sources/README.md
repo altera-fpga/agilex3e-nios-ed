@@ -86,7 +86,7 @@ niosv-app --bsp-dir=sw/bsp --app-dir=sw/app --srcs=sw/app/main.c
 niosv-shell
 cmake -S ./sw/app -B sw/app/build -G "Unix Makefiles"
 make -C sw/app/build
-elf2hex sw/app/build/app.elf -b 0x0 -w 32 -e 0x9ffff sw/app/build/onchip_mem.hex -r4
+elf2hex sw/app/build/app.elf -b 0x0 -w 32 -e 0x3ffff sw/app/build/onchip_mem.hex -r4
 ```
 
 ### 3. Running simulation
