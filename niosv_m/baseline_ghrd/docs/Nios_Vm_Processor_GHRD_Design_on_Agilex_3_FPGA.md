@@ -13,14 +13,14 @@
 ### Release Contents  
 
 #### Binaries
- - Prebuilt binaries are located [here](https://github.com/altera-fpga/agilex3e-nios-ed/blob/rel/25.1.0/niosv_m/baseline_ghrd/ready_to_test).
+ - Prebuilt binaries are located [here](https://github.com/altera-fpga/agilex3e-nios-ed/blob/rel/25.1.1/niosv_m/baseline_ghrd/ready_to_test).
  - The sof and elf files required to run the design can be found in "ready_to_test" folder 
  - Program the sof and download the elf file on board
 
-### Nios® V/m Baseline Golden Hardware Reference Design (GHRD) Archiecture
+### Nios® V/m Baseline Golden Hardware Reference Design (GHRD) Architecture
  This example design includes a Nios® V/m processor connected to the On Chip RAM-II, JTAG UART IP, Parallel-IO and System ID peripheral core. The objective of the design is to accomplish data transfer between the processor and soft IP peripherals.
  
- ![Block Diagram](https://github.com/altera-fpga/agilex3e-nios-ed/blob/rel/25.1.0/niosv_m/baseline_ghrd/img/baseline_ghrd_block_design.png)
+ ![Block Diagram](https://github.com/altera-fpga/agilex3e-nios-ed/blob/rel/25.1.1/niosv_m/baseline_ghrd/img/baseling_ghrd_block_design.png)
 
 #### Nios® V/m Processor
 - Microcontroller- Balanced (For interrupt driven baremetal and RTOS code)
@@ -57,10 +57,10 @@
 #### Tools Download and Installation
 1. Quartus Prime Pro
 
- - Download the Quartus® Prime Pro Edition software version 25.1 from the FPGA Software Download Center webpage of the Intel website. Follow the on-screen instructions to complete the installation process. Choose an installation directory that is relative to the Quartus® Prime Pro Edition software installation directory.
+ - Download the Quartus® Prime Pro Edition software version 25.1.1 from the FPGA Software Download Center webpage of the Intel website. Follow the on-screen instructions to complete the installation process. Choose an installation directory that is relative to the Quartus® Prime Pro Edition software installation directory.
  - Set up the Quartus tools in the PATH, so they are accessible without full path.
 ```console
-	export QUARTUS_ROOTDIR=~/intelFPGA_pro/25.1/quartus/
+	export QUARTUS_ROOTDIR=~/intelFPGA_pro/25.1.1/quartus/
 	export PATH=$QUARTUS_ROOTDIR/bin:$QUARTUS_ROOTDIR/linux64:$QUARTUS_ROOTDIR/../qsys/bin:$PATH
 ```
 
@@ -76,7 +76,7 @@ quartus_py ./scripts/build_sof.py
 
  - The quartus tool will compile the design and generate the output files
 
-###### Note: The sof (binary) generation is not supported for Agilex 3 devices on Quartus 25.1 version. Hence, you will observe "sof not generated" critical warning while compiling this design.
+###### Note: The sof (binary) generation is not supported for Agilex 3 devices on Quartus 25.1.1 version. Hence, you will observe "sof not generated" critical warning while compiling this design.
 
 #### Software Compilation 
 - To create software app, run the following commands in the terminal:

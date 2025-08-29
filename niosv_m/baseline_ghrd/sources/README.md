@@ -8,9 +8,9 @@ This example design includes a Nios® V/m processor connected to the On Chip RAM
 
 The objective of the design is to accomplish data transfer between the processor and on chip memory. 
 
-###### Note: The sof (binary) generation is not supported for Agilex 3 devices on Quartus 25.1 version. Hence, you will observe "sof not generated" critical warning while compiling this design.
+###### Note: The sof (binary) generation is not supported for Agilex 3 devices starting from Quartus 25.1.1 version. Hence, you will observe "sof not generated" critical warning while compiling this design.
 
-![image](https://github.com/altera-fpga/agilex3e-nios-ed/blob/rel/25.1.0/niosv_m/baseline_ghrd/img/baseline_ghrd_block_design.png)
+![image](https://github.com/altera-fpga/agilex3e-nios-ed/blob/rel/25.1.1/niosv_m/baseline_ghrd/img/baseline_ghrd_block_design.png)
 
 ## Project Details
 
@@ -18,18 +18,18 @@ The objective of the design is to accomplish data transfer between the processor
 * **Source**: Github
 * **Design Support**: SCT
 * **Family**: Agilex 3
-* **Quartus Version**: 25.1.0
+* **Quartus Version**: 25.1.1
 * **Development Kit**: Agilex™ 3 FPGA C-Series 135 (M16A) A3CW135BM16AE6S
 * **Device Part**: A3CW135BM16AE6S
 * **Design Package**: agilex3_niosv_m_baseline_ghrd.zip
 * **Category**: GHRD
-* **URL**: https://github.com/altera-fpga/agilex3e-nios-ed/tree/rel/25.1.0/niosv_m/baseline_ghrd
-* **downloadURL**: https://github.com/altera-fpga/agilex3e-nios-ed/releases/download/25.1.0-v1.0/agilex3_niosv_m_baseline_ghrd.zip
+* **URL**: https://github.com/altera-fpga/agilex3e-nios-ed/tree/rel/25.1.1/niosv_m/baseline_ghrd
+* **downloadURL**: https://github.com/altera-fpga/agilex3e-nios-ed/releases/download/25.1.1-v1.0/agilex3_niosv_m_baseline_ghrd.zip
 
 ## Documentation
 
 * **Title**: Design Document
-* **URL**: https://github.com/altera-fpga/agilex3e-nios-ed/blob/rel/25.1.0/niosv_m/baseline_ghrd/docs/Nios_Vm_Processor_Baseline_GHRD_Design_on_Agilex_3_FPGA.md
+* **URL**: https://github.com/altera-fpga/agilex5e-nios-ed/blob/rel/25.1.1/niosv_m/baseline_ghrd/docs/Nios_Vm_Processor_Baseline_GHRD_Design_on_Agilex_3_FPGA.md
 
 # Getting Started
 
