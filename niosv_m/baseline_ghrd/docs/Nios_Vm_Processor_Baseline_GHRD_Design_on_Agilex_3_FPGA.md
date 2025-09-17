@@ -20,7 +20,7 @@
 ### Nios® V/m Baseline Golden Hardware Reference Design (GHRD) Architecture
  This example design includes a Nios® V/m processor connected to the On Chip RAM-II, JTAG UART IP, Parallel-IO and System ID peripheral core. The objective of the design is to accomplish data transfer between the processor and soft IP peripherals.
  
- ![Block Diagram](https://github.com/altera-fpga/agilex3e-nios-ed/blob/rel/25.1.1/niosv_m/baseline_ghrd/img/baseling_ghrd_block_design.png)
+ ![Block Diagram](https://github.com/altera-fpga/agilex3e-nios-ed/blob/rel/25.1.1/niosv_m/baseline_ghrd/img/baseline_ghrd_block_design.png)
 
 #### Nios® V/m Processor
 - Microcontroller- Balanced (For interrupt driven baremetal and RTOS code)
