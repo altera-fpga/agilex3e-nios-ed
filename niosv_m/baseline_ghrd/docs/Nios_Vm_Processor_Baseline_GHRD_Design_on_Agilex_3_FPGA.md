@@ -85,14 +85,14 @@ niosv-bsp -c --quartus-project=hw/top.qpf --qsys=hw/qsys_top.qsys --type=hal sw/
 niosv-app --bsp-dir=sw/bsp --app-dir=sw/app --srcs=sw/app/main.c
 cmake -S ./sw/app -B sw/app/build
 make -C sw/app/build
-elf2hex sw/app/build/app.elf -b 0x0 -w 32 -e 0x3ffff hw/onchip_mem.hex -r4
+elf2hex sw/app/build/app.elf -b 0x0 -w 32 -e 0x3ffff sw/niosv_app/build/onchip_mem.hex -r4
 ```
 
 #### Running simulation
 Simulation is enabled for this design where the memory is initialized with the application hex. Use the following commands to run the simulation:
 ```console
+cp ./sw/niosv_app/build/onchip_mem.hex ./hw/qsys_top_tb/qsys_top_tb/sim/mentor
 cd hw/qsys_top_tb/qsys_top_tb/sim/mentor/
-cp ./sw/niosv_app/build/onchip_mem.hex ./qsys_top_tb/qsys_top_tb/sim/mentor
 vsim &
 source msim_setup.tcl
 ld_debug
