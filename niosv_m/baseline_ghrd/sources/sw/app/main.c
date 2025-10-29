@@ -90,7 +90,6 @@ int pio_test()
         
         // Read back value from PIO
         printf("DATA READBACK FROM PIO_0_BASE is 0x%x \n", IORD_ALTERA_AVALON_PIO_DATA(PIO_0_BASE));
-        printf("DATA READBACK FROM PIO_1_BASE is 0x%x \n", IORD_ALTERA_AVALON_PIO_DATA(PIO_1_BASE));
 
         // Verify the read-back value matches expected pattern
         if (i != IORD_ALTERA_AVALON_PIO_DATA(PIO_0_BASE))
