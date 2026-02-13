@@ -1,18 +1,17 @@
 # Nios V Example Designs Repository
 
-This repository contains the Nios V Example designs based on Agilex™ 3 FPGA C-Series 135 (M16A) A3CW135BM16AE6S
+This repository contains the Nios V Example design based on Terasic Atum A3 Nano FPGA board
 
-Development Kit product page- https://www.intel.com/content/www/us/en/content-details/833122/agilex-3-fpgas-and-socs-product-brief.html 
+FPGA board product page- https://www.terasic.com.tw/cgi-bin/page/archive.pl?Language=English&CategoryNo=44&No=1373#contents
 
 The following table contains the list of Acronyms that the user may come across in the design details
 
 | Acronym | Expansion |
 | --- | ------ |
-| DMA | Direct Memory Access |
+| MSGDMA | Modular Scatter-Gather Direct Memory Access |
 | OCM | On-Chip Memory |
 | PIO | Parallel I/O |
 | RTOS | Real Time Operating System |
-| GHRD | Golden Hardware Reference Design |
 
 There are three variants of the NiosV core:
     
@@ -23,11 +22,11 @@ There are three variants of the NiosV core:
     c. Nios V/c core - Compact Microcontroller- Smallest (For non-interrupt driven baremetal code)
 
 
-The following table contains the list of the designs on Agilex™ 3 FPGA C-Series 135 (M16A) A3CW135BM16AE6S
+The following table contains the list of the designs on Terasic Atum A3 Nano FPGA board
 
 | # | Nios V core | Design name | Description |
 | - | --- | ------ | ----------- |
-| 1 | Nios V/m | Baseline Golden Hardware Reference Design (GHRD) | This design demonstrates the baseline Golden Hardware Reference Design (GHRD) for a Nios V/m processor with basic bare minimum peripherals required for any application execution <br>[Design details](niosv_m/baseline_ghrd/docs/Nios_Vm_Processor_Baseline_GHRD_Design_on_Agilex_3_FPGA.md)
+| 1 | Nios V/g | Nios V/g Webserver Ping Design | This design demonstrates the Ping application using the Triple Speed Ethernet IP <br>[Design details](terasic_atum_a3_nano/niosv_g/niosv_g_webserver_ping/docs/Nios_Vg_Processor_Webserver_Ping_Design_on_Atum_A3_Nano_FPGA.md)
 
 
 Refer to the documents in the following link for More information on the Nios V Processor core - [https://www.intel.com/content/www/us/en/support/programmable/support-resources/support-centers/nios-v-support.html ](https://www.intel.com/content/www/us/en/support/programmable/support-resources/support-centers/nios-v-support.html#introtext_1506028531_1693475107)
