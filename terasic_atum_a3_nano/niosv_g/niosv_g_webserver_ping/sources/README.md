@@ -5,11 +5,15 @@
 ## Description
 
 The example design demonstrates ping application. The Nios V/g acts as the core. The Triple Speed Ethernet (TSE) IP is configured in RGMII mode and connectes to the onboard DP83867IR TI PHY via RGMII interface. 
+
 The design has 2 MSGDMA IPs configured in Memory Mapped to Stream (MM2S) mode for Transmission and Stream to Memory Mapped (S2MM) mode for Reception.
 
 To test the application, connect the RGMII Interface of the Atum 3 Development Kit to the Link Partner using RJ-45 cable.
+
 Ensure that the IP addresses are modified accordingly in the application code under the following location - sw/app_freertos/main.c
+
 Once the application binaries are downloaded (See section 3.d below for the steps), the board starts pinging the link partner automatically.
+
 Observe the Ping Request and Response prints on the terminal.
 
 
@@ -30,6 +34,31 @@ To ensure the correct files are picked, please do the following steps:
 
 4. Run the app creation , cmake and make commands from section 3c below. Do not re-generate BSP as it will overwrite the replaced driver files.
 
+
+## Link Partner settings
+
+1. Set the following setting on the interface of the link partner
+
+    Speed- 100 Mbps
+
+    Duplex- Full
+
+    Auto-Negotiation- Off
+
+command: ethtool -s <interface_name> speed 100 duplex full autoneg off
+
+
+## Expected Output
+
+The snapshot below captures the output on the board when the elf file is downloaded (See section 3.d below for the steps to download).
+
+Board IP address: 10.0.0.2
+
+Link partner (linux host) IP address: 10.0.0.1
+
+Speed: 100Mbps
+
+![image](https://github.com/altera-fpga/agilex3c-nios-ed/blob/rel/25.3.1/terasic_atum_a3_nano/niosv_g/niosv_g_webserver_ping/img/expected_output.png)
 
 ## Project Details
 
