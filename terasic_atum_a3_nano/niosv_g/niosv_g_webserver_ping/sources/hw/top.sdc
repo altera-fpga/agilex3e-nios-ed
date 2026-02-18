@@ -102,35 +102,35 @@ set rxd3_trace_max 0.62
 set ext_tco_min 0.3
 set ext_tco_max 0.6
  
-set_input_delay -clock [get_clocks mac_clk_125_virtual]  -source_latency_included -max [expr {$rxctl_trace_max - $clk_trace_min + $ext_tco_max}] [get_ports i_rgmii_rx_control]
-set_input_delay -clock [get_clocks mac_clk_125_virtual]  -source_latency_included -min [expr {$rxctl_trace_min - $clk_trace_max + $ext_tco_min}] [get_ports i_rgmii_rx_control]
+set_input_delay -clock [get_clocks mac_clk_125_virtual]  -source_latency_included -max [expr {$rxctl_trace_max - $clk_trace_min + $ext_tco_max}] [get_ports rgmii_rxctl]
+set_input_delay -clock [get_clocks mac_clk_125_virtual]  -source_latency_included -min [expr {$rxctl_trace_min - $clk_trace_max + $ext_tco_min}] [get_ports rgmii_rxctl]
  
-set_input_delay -clock [get_clocks mac_clk_125_virtual]  -source_latency_included -max [expr {$rxctl_trace_max - $clk_trace_min + $ext_tco_max}] [get_ports i_rgmii_rx_control] -clock_fall -add_delay
-set_input_delay -clock [get_clocks mac_clk_125_virtual]  -source_latency_included -min [expr {$rxctl_trace_min - $clk_trace_max + $ext_tco_min}] [get_ports i_rgmii_rx_control] -clock_fall -add_delay
+set_input_delay -clock [get_clocks mac_clk_125_virtual]  -source_latency_included -max [expr {$rxctl_trace_max - $clk_trace_min + $ext_tco_max}] [get_ports rgmii_rxctl] -clock_fall -add_delay
+set_input_delay -clock [get_clocks mac_clk_125_virtual]  -source_latency_included -min [expr {$rxctl_trace_min - $clk_trace_max + $ext_tco_min}] [get_ports rgmii_rxctl] -clock_fall -add_delay
  
-set_input_delay -clock [get_clocks mac_clk_125_virtual]  -source_latency_included -max [expr {$rxd0_trace_max - $clk_trace_min + $ext_tco_max}] [get_ports i_rgmii_in[0]]
-set_input_delay -clock [get_clocks mac_clk_125_virtual]  -source_latency_included -min [expr {$rxd0_trace_min - $clk_trace_max + $ext_tco_min}] [get_ports i_rgmii_in[0]]
+set_input_delay -clock [get_clocks mac_clk_125_virtual]  -source_latency_included -max [expr {$rxd0_trace_max - $clk_trace_min + $ext_tco_max}] [get_ports rgmii_in[0]]
+set_input_delay -clock [get_clocks mac_clk_125_virtual]  -source_latency_included -min [expr {$rxd0_trace_min - $clk_trace_max + $ext_tco_min}] [get_ports rgmii_in[0]]
  
-set_input_delay -clock [get_clocks mac_clk_125_virtual]  -source_latency_included -max [expr {$rxd0_trace_max - $clk_trace_min + $ext_tco_max}] [get_ports i_rgmii_in[0]] -clock_fall -add_delay
-set_input_delay -clock [get_clocks mac_clk_125_virtual]  -source_latency_included -min [expr {$rxd0_trace_min - $clk_trace_max + $ext_tco_min}] [get_ports i_rgmii_in[0]] -clock_fall -add_delay
+set_input_delay -clock [get_clocks mac_clk_125_virtual]  -source_latency_included -max [expr {$rxd0_trace_max - $clk_trace_min + $ext_tco_max}] [get_ports rgmii_in[0]] -clock_fall -add_delay
+set_input_delay -clock [get_clocks mac_clk_125_virtual]  -source_latency_included -min [expr {$rxd0_trace_min - $clk_trace_max + $ext_tco_min}] [get_ports rgmii_in[0]] -clock_fall -add_delay
  
-set_input_delay -clock [get_clocks mac_clk_125_virtual]  -source_latency_included -max [expr {$rxd1_trace_max - $clk_trace_min + $ext_tco_max}] [get_ports i_rgmii_in[1]]
-set_input_delay -clock [get_clocks mac_clk_125_virtual]  -source_latency_included -min [expr {$rxd1_trace_min - $clk_trace_max + $ext_tco_min}] [get_ports i_rgmii_in[1]]
+set_input_delay -clock [get_clocks mac_clk_125_virtual]  -source_latency_included -max [expr {$rxd1_trace_max - $clk_trace_min + $ext_tco_max}] [get_ports rgmii_in[1]]
+set_input_delay -clock [get_clocks mac_clk_125_virtual]  -source_latency_included -min [expr {$rxd1_trace_min - $clk_trace_max + $ext_tco_min}] [get_ports rgmii_in[1]]
  
-set_input_delay -clock [get_clocks mac_clk_125_virtual]  -source_latency_included -max [expr {$rxd1_trace_max - $clk_trace_min + $ext_tco_max}] [get_ports i_rgmii_in[1]] -clock_fall -add_delay
-set_input_delay -clock [get_clocks mac_clk_125_virtual]  -source_latency_included -min [expr {$rxd1_trace_min - $clk_trace_max + $ext_tco_min}] [get_ports i_rgmii_in[1]] -clock_fall -add_delay
+set_input_delay -clock [get_clocks mac_clk_125_virtual]  -source_latency_included -max [expr {$rxd1_trace_max - $clk_trace_min + $ext_tco_max}] [get_ports rgmii_in[1]] -clock_fall -add_delay
+set_input_delay -clock [get_clocks mac_clk_125_virtual]  -source_latency_included -min [expr {$rxd1_trace_min - $clk_trace_max + $ext_tco_min}] [get_ports rgmii_in[1]] -clock_fall -add_delay
  
-set_input_delay -clock [get_clocks mac_clk_125_virtual]  -source_latency_included -max [expr {$rxd2_trace_max - $clk_trace_min + $ext_tco_max}] [get_ports i_rgmii_in[2]]
-set_input_delay -clock [get_clocks mac_clk_125_virtual]  -source_latency_included -min [expr {$rxd2_trace_min - $clk_trace_max + $ext_tco_min}] [get_ports i_rgmii_in[2]]
+set_input_delay -clock [get_clocks mac_clk_125_virtual]  -source_latency_included -max [expr {$rxd2_trace_max - $clk_trace_min + $ext_tco_max}] [get_ports rgmii_in[2]]
+set_input_delay -clock [get_clocks mac_clk_125_virtual]  -source_latency_included -min [expr {$rxd2_trace_min - $clk_trace_max + $ext_tco_min}] [get_ports rgmii_in[2]]
  
-set_input_delay -clock [get_clocks mac_clk_125_virtual]  -source_latency_included -max [expr {$rxd2_trace_max - $clk_trace_min + $ext_tco_max}] [get_ports i_rgmii_in[2]] -clock_fall -add_delay
-set_input_delay -clock [get_clocks mac_clk_125_virtual]  -source_latency_included -min [expr {$rxd2_trace_min - $clk_trace_max + $ext_tco_min}] [get_ports i_rgmii_in[2]] -clock_fall -add_delay
+set_input_delay -clock [get_clocks mac_clk_125_virtual]  -source_latency_included -max [expr {$rxd2_trace_max - $clk_trace_min + $ext_tco_max}] [get_ports rgmii_in[2]] -clock_fall -add_delay
+set_input_delay -clock [get_clocks mac_clk_125_virtual]  -source_latency_included -min [expr {$rxd2_trace_min - $clk_trace_max + $ext_tco_min}] [get_ports rgmii_in[2]] -clock_fall -add_delay
  
-set_input_delay -clock [get_clocks mac_clk_125_virtual]  -source_latency_included -max [expr {$rxd3_trace_max - $clk_trace_min + $ext_tco_max}] [get_ports i_rgmii_in[3]]
-set_input_delay -clock [get_clocks mac_clk_125_virtual]  -source_latency_included -min [expr {$rxd3_trace_min - $clk_trace_max + $ext_tco_min}] [get_ports i_rgmii_in[3]]
+set_input_delay -clock [get_clocks mac_clk_125_virtual]  -source_latency_included -max [expr {$rxd3_trace_max - $clk_trace_min + $ext_tco_max}] [get_ports rgmii_in[3]]
+set_input_delay -clock [get_clocks mac_clk_125_virtual]  -source_latency_included -min [expr {$rxd3_trace_min - $clk_trace_max + $ext_tco_min}] [get_ports rgmii_in[3]]
  
-set_input_delay -clock [get_clocks mac_clk_125_virtual]  -source_latency_included -max [expr {$rxd3_trace_max - $clk_trace_min + $ext_tco_max}] [get_ports i_rgmii_in[3]] -clock_fall -add_delay
-set_input_delay -clock [get_clocks mac_clk_125_virtual]  -source_latency_included -min [expr {$rxd3_trace_min - $clk_trace_max + $ext_tco_min}] [get_ports i_rgmii_in[3]] -clock_fall -add_delay 
+set_input_delay -clock [get_clocks mac_clk_125_virtual]  -source_latency_included -max [expr {$rxd3_trace_max - $clk_trace_min + $ext_tco_max}] [get_ports rgmii_in[3]] -clock_fall -add_delay
+set_input_delay -clock [get_clocks mac_clk_125_virtual]  -source_latency_included -min [expr {$rxd3_trace_min - $clk_trace_max + $ext_tco_min}] [get_ports rgmii_in[3]] -clock_fall -add_delay 
  
 ## To make sure to consider the immediate posedge at destination 
 set_multicycle_path 0 -setup -end -rise_from [get_clocks mac_clk_125_virtual] -rise_to [get_clocks rgmii_rx_clk]

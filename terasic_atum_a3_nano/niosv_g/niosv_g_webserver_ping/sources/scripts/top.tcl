@@ -122,7 +122,7 @@ if {$make_assignments} {
 	# IOBANK_6D
 	set_location_assignment PIN_AU4 -to rgmii_rxctl -comment IOBANK_6D
 	set_instance_assignment -name IO_STANDARD "1.8-V LVCMOS" -to rgmii* -entity top
-	set_instance_assignment -name INPUT_DELAY_CHAIN 45 -to rx_ctrl -entity top
+	set_instance_assignment -name INPUT_DELAY_CHAIN 45 -to rgmii_rxctl -entity top
 	set_instance_assignment -name INPUT_DELAY_CHAIN 45 -to rgmii_in[0] -entity top
 	set_instance_assignment -name INPUT_DELAY_CHAIN 45 -to rgmii_in[1] -entity top
 	set_instance_assignment -name INPUT_DELAY_CHAIN 45 -to rgmii_in[2] -entity top
