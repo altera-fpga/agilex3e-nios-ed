@@ -27,7 +27,7 @@ The following table contains the list of the designs on Terasic Atum A3 Nano FPG
 | # | Nios V core | Design name | Description |
 | - | --- | ------ | ----------- |
 | 1 | Nios V/g | Nios V/g Webserver Ping Design | This design demonstrates the Ping application using the Triple Speed Ethernet IP <br>[Design details](terasic_atum_a3_nano/niosv_g/niosv_g_webserver_ping/docs/Niosv_g_Processor_Webserver_Ping_Design_on_Atum_A3_Nano_FPGA.md)|
-| 2 | Nios V/g | Nios V/g TinyML LiteRT | This design demonstrates the TinyML application using LiteRT for microcontrollers software with Nios® V/g processor<br>[Design details](niosv_g/tinyml_liteRT/docs/Niosv_g_Processor_TinyML_Design_on_Terasic_Atum_A3_Nano_FPGA.md) |
+| 2 | Nios V/g | Nios V/g TinyML LiteRT | This design demonstrates the TinyML application using LiteRT for microcontrollers software with Nios® V/g processor<br>[Design details](niosv_g/niosv_g_tinyml_liteRT/docs/Niosv_g_Processor_TinyML_Design_on_Terasic_Atum_A3_Nano_FPGA.md) |
 
 
 Refer to the documents in the following link for More information on the Nios V Processor core - [https://www.intel.com/content/www/us/en/support/programmable/support-resources/support-centers/nios-v-support.html ](https://www.intel.com/content/www/us/en/support/programmable/support-resources/support-centers/nios-v-support.html#introtext_1506028531_1693475107)
