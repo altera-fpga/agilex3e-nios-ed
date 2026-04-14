@@ -114,7 +114,7 @@ jtagconfig --setparam 1 JtagClock 6M
 - Program the generated sof and then download the elf file on the board
     
 ```console
-quartus_pgm --cable=1 -m jtag -o 'p;ready_to_test/top.sof'
+quartus_pgm --cable=1 -m jtag -o 'p;ready_to_test/golden_top.sof'
 ```
 
 #### Program Software Image ELF
