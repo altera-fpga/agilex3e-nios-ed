@@ -6,7 +6,7 @@ Nios® V/g Processor-based TinyML LiteRT System Example Design on the Terasic At
 
 This design demonstrates the TinyML application using LiteRT for microcontrollers software with Nios® V/g processor on the Atum A3 Nano FPGA board. 
 
-![image](https://github.com/altera-fpga/agilex3c-nios-ed/blob/rel/26.1/niosv_g/tinyml_liteRT/img/block_diagram.png)
+![image](https://github.com/altera-fpga/agilex3c-nios-ed/blob/rel/26.1/terasic_atum_a3_nano/niosv_g/niosv_g_tinyml_liteRT/img/block_diagram.png)
 
 ## Project Details
 
