@@ -1,14 +1,14 @@
-# Nios® V/g Ping Design 
+# Nios® V/g Ping System Example Design 
 
- This design demonstrates the Ping application on a Nios® V/g processor using the Triple Speed Ethernet IP for the Atum 3 Terasic Development Kit.
+ This design demonstrates the Ping application on a Nios® V/g processor using the Triple Speed Ethernet IP for the Atum A3 Nano FPGA board.
 
 ## Description
 
-The example design demonstrates ping application. The Nios V/g acts as the core. The Triple Speed Ethernet (TSE) IP is configured in RGMII mode and connectes to the onboard DP83867IR TI PHY via RGMII interface. 
+The System Example Design demonstrates ping application. The Nios V/g acts as the core. The Triple Speed Ethernet (TSE) IP is configured in RGMII mode and connectes to the onboard DP83867IR TI PHY via RGMII interface. 
 
 The design has 2 MSGDMA IPs configured in Memory Mapped to Stream (MM2S) mode for Transmission and Stream to Memory Mapped (S2MM) mode for Reception.
 
-To test the application, connect the RGMII Interface of the Atum 3 Development Kit to the Link Partner using RJ-45 cable.
+To test the application, connect the RGMII Interface of the Atum A3 Nano FPGA board to the Link Partner using RJ-45 cable.
 
 Ensure that the IP addresses are modified accordingly in the application code under the following location - sw/app_freertos/main.c
 
@@ -16,13 +16,15 @@ Once the application binaries are downloaded (See section 3.d below for the step
 
 Observe the Ping Request and Response prints on the terminal.
 
+This design is created on the Quartus Visual Designer Studio. Fore more Information please visit here Visual Designer Studio[https://www.altera.com/products/development-tools/visual-designer-studio].
 
-![image](https://github.com/altera-fpga/agilex3c-nios-ed/blob/rel/25.3.1/terasic_atum_a3_nano/niosv_g/niosv_g_webserver_ping/img/web_server_block_diagram.png)
+
+![image](https://github.com/altera-fpga/agilex3c-nios-ed/blob/rel/26.1/terasic_atum_a3_nano/niosv_g/niosv_g_webserver_ping/img/web_server_block_diagram.png)
 
 
 ## Manual update of the TSE and MSGDMA driver code
 
-For 25.3.1, when the user builds the Niosv BSP, the driver code for TSE and MSGDMA are not compatible with Agilex 3.
+For 26.1, when the user builds the Niosv BSP, the driver code for TSE and MSGDMA are not compatible with Agilex 3.
 
 To ensure the correct files are picked, please do the following steps:
 
@@ -58,31 +60,31 @@ Link partner (linux host) IP address: 10.0.0.1
 
 Speed: 100Mbps
 
-![image](https://github.com/altera-fpga/agilex3c-nios-ed/blob/rel/25.3.1/terasic_atum_a3_nano/niosv_g/niosv_g_webserver_ping/img/expected_output.png)
+![image](https://github.com/altera-fpga/agilex3c-nios-ed/blob/rel/26.1/terasic_atum_a3_nano/niosv_g/niosv_g_webserver_ping/img/expected_output.png)
 
 ## Project Details
 
-- **Title**: Nios® V/g Ping Design
+- **Title**: Nios® V/g Ping System Example Design
 - **Source**: Github
 - **Design Support**: CTH
 - **Family**: Agilex 3
-- **Quartus Version**: 25.3.1
+- **Quartus Version**: 26.1
 - **Development Kit**: default
 - **Device Part**: A3CZ135BB18AE7S
 - **Design Package**: atum_a3_nano_niosv_g_webserver_ping.zip
 - **Category**: Networking
-- **URL**: https://github.com/altera-fpga/agilex3c-nios-ed/blob/rel/25.3.1/terasic_atum_a3_nano/niosv_g/niosv_g_webserver_ping
-- **download URL**: https://github.com/altera-fpga/agilex3c-nios-ed/releases/download/25.3.1/atum_a3_nano_niosv_g_webserver_ping.zip
+- **URL**: https://github.com/altera-fpga/agilex3c-nios-ed/blob/rel/26.1/terasic_atum_a3_nano/niosv_g/niosv_g_webserver_ping
+- **download URL**: https://github.com/altera-fpga/agilex3c-nios-ed/releases/download/26.1/atum_a3_nano_niosv_g_webserver_ping.zip
 
 ## Documentation
 
 - **Title**: Design Document 
-**URL**: https://github.com/altera-fpga/agilex3c-nios-ed/blob/rel/25.3.1/terasic_atum_a3_nano/niosv_g/niosv_g_webserver_ping/docs/Nios_Vg_Processor_Webserver_Ping_Design_on_Atum_A3_Nano_FPGA.md
+**URL**: https://github.com/altera-fpga/agilex3c-nios-ed/blob/rel/26.1/terasic_atum_a3_nano/niosv_g/niosv_g_webserver_ping/docs/Nios_Vg_Processor_Webserver_Ping_Design_on_Atum_A3_Nano_FPGA.md
 
 
 # Getting Started
 
-Vendor: Altera
+Vendor: Terasic
  
 1. Directory structure
 2. Using existing files (sof and elf) to run on hardware
@@ -139,7 +141,7 @@ c. Creating the bsp, build software sources and download elf
 - Clean the app build project before regenerating elf
 
 ```     
-niosv-bsp -c --quartus-project=hw/top.qpf --qsys=hw/qsys_top.qsys --type=freertos --cmd="enable_sw_package altera_freertos_tcpip" --script=sw/bsp_settings.tcl --no-default sw/bsp_freertos/settings.bsp
+niosv-bsp --create --no-default --system=./hw/src/vds/qsys_top/qsys_top.vds --quartus_project=./hw/top.qpf --type=freertos -cmd="enable_sw_package altera_freertos_tcpip"  ./sw/bsp_freertos/settings.bsp --script=./sw/bsp_settings.tcl
 niosv-app --bsp-dir=sw/bsp_freertos --app-dir=sw/app_freertos --srcs=sw/app_freertos/main.c
 cmake -S ./sw/app_freertos -B sw/app_freertos/build
 make -C sw/app_freertos/build
@@ -157,7 +159,7 @@ quartus_pgm --cable=1 -m jtag -o 'p;ready_to_test/top.sof'
 ```
 jtagconfig --setparam 1 JtagClock 6M
 ```
-- Toggle the In-System-Sources and Probe (ISSP) IP to initialize PHY and set it to 1G.
+- Toggle the In-System-Sources and Probe (ISSP) IP to initialize PHY and set it to 100M.
 ```
 quartus_stp -t ready_to_test/toggle_issp.tcl
 ```

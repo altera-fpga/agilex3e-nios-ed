@@ -1,4 +1,4 @@
-# Copyright (C) 2025  Altera Corporation. All rights reserved.
+# Copyright (C) 2026  Altera Corporation. All rights reserved.
 # Your use of Altera Corporation's design tools, logic functions 
 # and other software and tools, and any partner logic 
 # functions, and any output files from any of the foregoing 
@@ -15,7 +15,7 @@
 
 # Quartus Prime: Generate Tcl File for Project
 # File: top.tcl
-# Generated on: Tue Feb  3 02:22:50 2026
+# Generated on: Mon Mar  9 01:12:23 2026
 
 # Load Quartus Prime Tcl Project package
 package require ::quartus::project
@@ -42,12 +42,14 @@ if {[is_project_open]} {
 # Make assignments
 if {$make_assignments} {
 	set_global_assignment -name TOP_LEVEL_ENTITY top
-	set_global_assignment -name ORIGINAL_QUARTUS_VERSION 17.1.0
-	set_global_assignment -name PROJECT_CREATION_TIME_DATE "20:40:19  NOVEMBER 23, 2017"
-	set_global_assignment -name LAST_QUARTUS_VERSION "25.3.1 SP1.02 Pro Edition"
+	set_global_assignment -name ORIGINAL_QUARTUS_VERSION 26.1.0
+	set_global_assignment -name PROJECT_CREATION_TIME_DATE "02:50:42  MARCH 06, 2026"
+	set_global_assignment -name LAST_QUARTUS_VERSION "26.1.0 Pro Edition"
+	set_global_assignment -name PROJECT_OUTPUT_DIRECTORY output_files
+	set_global_assignment -name MIN_CORE_JUNCTION_TEMP 0
+	set_global_assignment -name MAX_CORE_JUNCTION_TEMP 100
 	set_global_assignment -name DEVICE A3CZ135BB18AE7S
 	set_global_assignment -name FAMILY "Agilex 3"
-	set_global_assignment -name PROJECT_OUTPUT_DIRECTORY output_files
 	set_global_assignment -name ERROR_CHECK_FREQUENCY_DIVISOR 256
 	set_global_assignment -name EDA_SIMULATION_TOOL "ModelSim-Altera (Verilog)"
 	set_global_assignment -name EDA_TIME_SCALE "1 ps" -section_id eda_simulation
@@ -65,25 +67,27 @@ if {$make_assignments} {
 	set_global_assignment -name POWER_APPLY_THERMAL_MARGIN ADDITIONAL
 	set_global_assignment -name POWER_THERMAL_SOLVER_MODE FIND_MAX_TJ
 	set_global_assignment -name BOARD default
-	set_global_assignment -name AUTO_RESOURCE_SHARING ON
-	set_global_assignment -name QSYS_FILE qsys_top.qsys
-	set_global_assignment -name IP_FILE ip/qsys_top/qsys_top_intel_onchip_memory_1.ip
-	set_global_assignment -name IP_FILE ip/qsys_top/qsys_top_jtag_uart_0.ip
-	set_global_assignment -name IP_FILE ip/qsys_top/qsys_top_intel_eth_tse_0.ip
-	set_global_assignment -name IP_FILE ip/qsys_top/qsys_top_msgdma_0.ip
-	set_global_assignment -name IP_FILE ip/qsys_top/qsys_top_msgdma_1.ip
-	set_global_assignment -name IP_FILE sys_pll.ip
 	set_global_assignment -name VERILOG_FILE top.v
-	set_global_assignment -name SDC_FILE top.sdc
+	set_global_assignment -name IP_FILE sys_pll.ip
+	set_global_assignment -name VERILOG_FILE sdram_axi.v
+	set_global_assignment -name VERILOG_FILE sdram_axi_pmem.v
+	set_global_assignment -name VERILOG_FILE sdram_axi_core.v
 	set_global_assignment -name IP_FILE reset_release.ip
 	set_global_assignment -name IP_FILE issp.ip
-	set_global_assignment -name IP_FILE ip/qsys_top/qsys_top_core_sdram_axi4_0.ip
-	set_global_assignment -name IP_FILE ip/qsys_top/qsys_top_intel_onchip_memory_0.ip
-	set_global_assignment -name IP_FILE ip/qsys_top/qsys_top_clock_bridge_1.ip
-	set_global_assignment -name IP_FILE ip/qsys_top/qsys_top_reset_bridge_1.ip
-	set_global_assignment -name IP_FILE ip/qsys_top/qsys_top_clock_bridge_2.ip
-	set_global_assignment -name IP_FILE ip/qsys_top/qsys_top_reset_bridge_2.ip
-	set_global_assignment -name IP_FILE ip/qsys_top/qsys_top_intel_niosv_g_0.ip
+	set_global_assignment -name IP_SEARCH_PATHS /nfs/site/disks/swuser_work_sgosavi/Example_Designs/26.1/vds/terasic_niosv_tse_ping_vds/custom_logic/core_sdram_axi/**/*
+	set_global_assignment -name VDS_FILE src/vds/qsys_top/qsys_top.vds -tag "vds::qsys_top"
+	set_global_assignment -name VDS_IP_FILE src/vds/qsys_top/ip/qsys_top_core_sdram_axi4_0.ip -tag "vds::qsys_top"
+	set_global_assignment -name VDS_IP_FILE src/vds/qsys_top/ip/qsys_top_intel_niosv_g_0.ip -tag "vds::qsys_top"
+	set_global_assignment -name VDS_IP_FILE src/vds/qsys_top/ip/qsys_top_clock_bridge_1.ip -tag "vds::qsys_top"
+	set_global_assignment -name VDS_IP_FILE src/vds/qsys_top/ip/qsys_top_reset_bridge_1.ip -tag "vds::qsys_top"
+	set_global_assignment -name VDS_IP_FILE src/vds/qsys_top/ip/qsys_top_clock_bridge_2.ip -tag "vds::qsys_top"
+	set_global_assignment -name VDS_IP_FILE src/vds/qsys_top/ip/qsys_top_reset_bridge_2.ip -tag "vds::qsys_top"
+	set_global_assignment -name VDS_IP_FILE src/vds/qsys_top/ip/qsys_top_intel_onchip_memory_1.ip -tag "vds::qsys_top"
+	set_global_assignment -name VDS_IP_FILE src/vds/qsys_top/ip/qsys_top_intel_onchip_memory_0.ip -tag "vds::qsys_top"
+	set_global_assignment -name VDS_IP_FILE src/vds/qsys_top/ip/qsys_top_jtag_uart_0.ip -tag "vds::qsys_top"
+	set_global_assignment -name VDS_IP_FILE src/vds/qsys_top/ip/qsys_top_intel_eth_tse_0.ip -tag "vds::qsys_top"
+	set_global_assignment -name VDS_IP_FILE src/vds/qsys_top/ip/qsys_top_msgdma_1.ip -tag "vds::qsys_top"
+	set_global_assignment -name VDS_IP_FILE src/vds/qsys_top/ip/qsys_top_msgdma_0.ip -tag "vds::qsys_top"
 	set_instance_assignment -name PARTITION_COLOUR 4289977599 -to top -entity top
 	set_instance_assignment -name PARTITION_COLOUR 4285964287 -to auto_fab_0 -entity top
 	set_location_assignment PIN_K43 -to CLK_50M

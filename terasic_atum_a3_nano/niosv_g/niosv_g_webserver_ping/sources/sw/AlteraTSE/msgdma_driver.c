@@ -353,7 +353,8 @@ static void vRefillRxBufferTask(void *pvParameters)
             }
 }
 
-void msgdma_rx_isr(void)
+
+    void msgdma_rx_isr(NET_DEV_DATA *pdev_data)
 {
     BaseType_t xRefillTaskWoken = pdFALSE;
 
@@ -437,7 +438,7 @@ void msgdma_init(NetworkInterface_t *pxInterface)
                 pdev_data->RxMsgdma,                        // mSGDMA device
                 (alt_msgdma_callback) msgdma_rx_isr, // callback function
                 0,                                          // control
-                NULL);                                       // arguments/context
+                pdev_data);                                       // arguments/context
         printf("mSGDMA RX ISR Registering: Success.\n");
 
         FreeRTOS_debug_printf( ("mSGDMA TX ISR Registering: Starting.\n") );
@@ -445,7 +446,7 @@ void msgdma_init(NetworkInterface_t *pxInterface)
                 pdev_data->TxMsgdma,                        // mSGDMA device
                 (alt_msgdma_callback) msgdma_tx_isr, // callback function
                 0,                                          // control
-                NULL);                                       // arguments/context
+                pdev_data);                                       // arguments/context
         printf("mSGDMA TX ISR Registering: Success.\n");
     }
     //Initialize mSGDMA descriptors (and descriptor lists).

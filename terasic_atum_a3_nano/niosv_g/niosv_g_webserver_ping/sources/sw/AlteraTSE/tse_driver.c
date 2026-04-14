@@ -47,13 +47,15 @@ void phy_reset()
 
 BaseType_t phy_init_rgmii()
 {
-    alt_u16 phy_reg = 0x0;
+    alt_u16 phy_reg,phy_reg1 = 0x0;
+    alt_u16 status_reg = 0x0;
     alt_u16 real_time_link_status= 0x0;
-    alt_u16 rgmiictrl = 0x0;
-    alt_u16 tctrl = 0x0;
     BaseType_t xReturn = pdFAIL;
     
     for (alt_32 i = 0; i < 10; i++) {
+
+        //Reset
+        //phy_reset();
 
         phy_reg = read_phy_register(TSE_MAC_BASE_ADDRESS, BASIC_MODE_CONTROL_REGISTER);
         //setting speed to 100M
@@ -65,31 +67,48 @@ BaseType_t phy_init_rgmii()
         phy_reg &= ~AUTO_NEGOTIATION_ENABLE;
         write_phy_register(TSE_MAC_BASE_ADDRESS, BASIC_MODE_CONTROL_REGISTER, phy_reg);
 
-        //RGMII timing control
-        rgmiictrl = read_phy_register(TSE_MAC_BASE_ADDRESS, REGISTER_CONTROL_REGISTER);
-        rgmiictrl = DEVAD_VALUE;
-        rgmiictrl &= ~(FUNCTION_BIT14 | FUNCTION_BIT15);
-        write_phy_register(TSE_MAC_BASE_ADDRESS, REGISTER_CONTROL_REGISTER, rgmiictrl);
-        write_phy_register(TSE_MAC_BASE_ADDRESS, ADDRESS_DATA_REGISTER, RGMII_CONTROL_REGISTER);
-        rgmiictrl = DEVAD_VALUE|FUNCTION_BIT14;
-        write_phy_register(TSE_MAC_BASE_ADDRESS, REGISTER_CONTROL_REGISTER, rgmiictrl);
-        rgmiictrl = read_phy_register(TSE_MAC_BASE_ADDRESS, ADDRESS_DATA_REGISTER);
-        rgmiictrl |= RGMII_RX_CLK_DELAY|RGMII_TX_CLK_DELAY;
-        write_phy_register(TSE_MAC_BASE_ADDRESS, ADDRESS_DATA_REGISTER, rgmiictrl);
+     
 
-        //add RGMII RX delay
-        tctrl = read_phy_register(TSE_MAC_BASE_ADDRESS, REGISTER_CONTROL_REGISTER);
-        tctrl = DEVAD_VALUE;
-        tctrl &= ~(FUNCTION_BIT14 | FUNCTION_BIT15);
-        write_phy_register(TSE_MAC_BASE_ADDRESS, REGISTER_CONTROL_REGISTER, tctrl);
-        write_phy_register(TSE_MAC_BASE_ADDRESS, ADDRESS_DATA_REGISTER, RGMII_DELAY_CONTROL_REGISTER);
-        tctrl = DEVAD_VALUE|FUNCTION_BIT14;
-        write_phy_register(TSE_MAC_BASE_ADDRESS, REGISTER_CONTROL_REGISTER, tctrl);
-        tctrl = read_phy_register(TSE_MAC_BASE_ADDRESS, ADDRESS_DATA_REGISTER);
-        tctrl = RGMII_DELAY;
-        write_phy_register(TSE_MAC_BASE_ADDRESS, ADDRESS_DATA_REGISTER, tctrl);
+
+        unsigned int rgmiictrl1, rgmiictrl2,rgmiictrl3= 0x0;
+        rgmiictrl1 = read_phy_register(TSE_MAC_BASE_ADDRESS, REGISTER_CONTROL_REGISTER);
+        rgmiictrl1 = DEVAD_BIT0|DEVAD_BIT1|DEVAD_BIT2|DEVAD_BIT3|DEVAD_BIT4;
+        rgmiictrl1 &= ~(FUNCTION_BIT14 | FUNCTION_BIT15);
+        write_phy_register(TSE_MAC_BASE_ADDRESS, REGISTER_CONTROL_REGISTER, rgmiictrl1);
+        printf ("Register ADDAR value is 0x%08X \n:", read_phy_register(TSE_MAC_BASE_ADDRESS, REGISTER_CONTROL_REGISTER));
+        write_phy_register(TSE_MAC_BASE_ADDRESS, ADDRESS_OR_DATA_REGISTER, RGMII_CONTROL_REGISTER);
+        printf ("Register ADDAR value is 0x%08X \n:", read_phy_register(TSE_MAC_BASE_ADDRESS, ADDRESS_OR_DATA_REGISTER));
+        rgmiictrl2 = DEVAD_BIT0|DEVAD_BIT1|DEVAD_BIT2|DEVAD_BIT3|DEVAD_BIT4|FUNCTION_BIT14;
+        write_phy_register(TSE_MAC_BASE_ADDRESS, REGISTER_CONTROL_REGISTER, rgmiictrl2);
+        printf ("Register control Register value after configuring data is 0x%08X \n:", rgmiictrl2);
+        printf ("RGMII ADDAR value is 0x%08X \n:", read_phy_register(TSE_MAC_BASE_ADDRESS, ADDRESS_OR_DATA_REGISTER));
+        rgmiictrl3 = read_phy_register(TSE_MAC_BASE_ADDRESS, ADDRESS_OR_DATA_REGISTER);
+        rgmiictrl3 |= RGMII_RX_CLK_DELAY|RGMII_TX_CLK_DELAY;
+        write_phy_register(TSE_MAC_BASE_ADDRESS, ADDRESS_OR_DATA_REGISTER, rgmiictrl3);
+        printf ("RGMII ADDAR value after write is 0x%08X \n:", read_phy_register(TSE_MAC_BASE_ADDRESS, ADDRESS_OR_DATA_REGISTER));
+
+
+        unsigned int tctrl1, tctrl2,tctrl3= 0x0;
+        tctrl1 = read_phy_register(TSE_MAC_BASE_ADDRESS, REGISTER_CONTROL_REGISTER);
+        printf ("Register control Register value is 0x%08X \n:", tctrl1);
+        tctrl1 = DEVAD_BIT0|DEVAD_BIT1|DEVAD_BIT2|DEVAD_BIT3|DEVAD_BIT4;
+        tctrl1 &= ~(FUNCTION_BIT14 | FUNCTION_BIT15);
+        write_phy_register(TSE_MAC_BASE_ADDRESS, REGISTER_CONTROL_REGISTER, tctrl1);
+        printf ("Register control Register value after configuring address is 0x%08X \n:", tctrl1);
+        write_phy_register(TSE_MAC_BASE_ADDRESS, ADDRESS_OR_DATA_REGISTER, RGMII_DELAY_CONTROL_REGISTER);
+        printf ("Register ADDAR value is 0x%08X \n:", read_phy_register(TSE_MAC_BASE_ADDRESS, ADDRESS_OR_DATA_REGISTER));
+        tctrl2 = DEVAD_BIT0|DEVAD_BIT1|DEVAD_BIT2|DEVAD_BIT3|DEVAD_BIT4|FUNCTION_BIT14;
+        write_phy_register(TSE_MAC_BASE_ADDRESS, REGISTER_CONTROL_REGISTER, tctrl2);
+        printf ("Register control Register value after configuring data is 0x%08X \n:", tctrl2);
+        printf ("RGMII ADDAR value is 0x%08X \n:", read_phy_register(TSE_MAC_BASE_ADDRESS, ADDRESS_OR_DATA_REGISTER));
+        tctrl3 = read_phy_register(TSE_MAC_BASE_ADDRESS, ADDRESS_OR_DATA_REGISTER);
+        tctrl3 = RGMII_RX_DELAY_CTRL_BIT0 | RGMII_RX_DELAY_CTRL_BIT3 | RGMII_TX_DELAY_CTRL_BIT0 | RGMII_TX_DELAY_CTRL_BIT3;
+        write_phy_register(TSE_MAC_BASE_ADDRESS, ADDRESS_OR_DATA_REGISTER, tctrl3);
+        printf ("RGMII ADDAR value is 0x%08X \n:", read_phy_register(TSE_MAC_BASE_ADDRESS, ADDRESS_OR_DATA_REGISTER));
+
 
         real_time_link_status = read_phy_register(TSE_MAC_BASE_ADDRESS, PHY_STATUS_REGISTER);
+        printf("Real time Link Status: 0x%08X\n", real_time_link_status);
 
         if (tse_phy_link_up()) {
             printf("Link up successful\n");
@@ -109,14 +128,6 @@ BaseType_t phy_init_rgmii()
         xReturn = pdFAIL;
     }
 
-
-    if (((real_time_link_status & SPEED_MASK) >> SPEED_SHIFT) == SPEED_100MBPS) {
-        printf("Speed is 100 Mbps\n");
-        xReturn = pdPASS;
-    } else {
-        printf("Speed is not set to 100 Gbps\n");
-        xReturn = pdFAIL;
-    }
 
 
     return xReturn;
@@ -161,7 +172,7 @@ void tse_mac_init(MACAddress_t mac_address)
 
     cmd_cfg = TSE_MAC_REGISTERS->command_config;
 
-    cmd_cfg &= ~MAC_CMDCFG_ETH_SPEED; 
+    cmd_cfg &= ~MAC_CMDCFG_ETH_SPEED; //changed eth speed to 100M
     cmd_cfg &= ~MAC_CMDCFG_HD_ENA;
     cmd_cfg |= MAC_CMDCFG_PAD_EN;
     cmd_cfg &= ~MAC_CMDCFG_CRC_FWD;
@@ -174,6 +185,7 @@ void tse_mac_init(MACAddress_t mac_address)
     cmd_cfg = TSE_MAC_REGISTERS->command_config;
     cmd_cfg |= MAC_CMDCFG_SW_RESET;
     TSE_MAC_REGISTERS->command_config = cmd_cfg;
+    printf ("Revision of the MAC is 0x%08X\n",IORD(TSE_MAC_BASE_ADDRESS,0));
 
 	while (1) {
         cmd_cfg = TSE_MAC_REGISTERS->command_config;
@@ -224,7 +236,7 @@ BaseType_t tse_mac_phy_init(MACAddress_t mac_addr)
 }
 
 BaseType_t tse_phy_link_up() {
-    return (((read_phy_register(TSE_MAC_BASE_ADDRESS, PHY_STATUS_REGISTER)) & COPPER_LINK_STATUS) == COPPER_LINK_STATUS);
+    return (((read_phy_register(TSE_MAC_BASE_ADDRESS, PHY_STATUS_REGISTER)) & LINK_STATUS_MASK) == LINK_STATUS_MASK);
 }
 
 void dumpMACStats() {
