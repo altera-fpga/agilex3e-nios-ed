@@ -17,7 +17,7 @@ This design demonstrates the TinyML application using LiteRT for microcontroller
  - Program the sof and download the elf file on board
 
 ### Nios® V/g TinyML LiteRT Design Architecture
- This example design includes a Nios® V processor connected to the On Chip RAM-II, JTAG UART IP and System ID peripheral core. The objective of the design is to accomplish data transfer between the processor and soft IP peripherals.
+ This example design includes a Nios® V processor connected to the SDRAM, JTAG UART IP and System ID peripheral core. The objective of the design is to accomplish data transfer between the processor and soft IP peripherals.
  
  ![Block Diagram](https://github.com/altera-fpga/agilex3c-nios-ed/blob/rel/26.1/terasic_atum_a3_nano/niosv_g/niosv_g_tinyml_liteRT/img/block_diagram.png)
 
@@ -30,7 +30,7 @@ This design demonstrates the TinyML application using LiteRT for microcontroller
  The following IPs are used in this Platform Designer component of the design:
 - Nios® V/g soft processor core
 
-- On Chip RAM-II
+- SDRAM
 
 - JTAG UART
 
@@ -49,9 +49,9 @@ This design demonstrates the TinyML application using LiteRT for microcontroller
 #### Nios V Address Map
  |Address Offset	|Size (Bytes)	|Peripheral	| Description|
   |-|-|-|-|
-  |0x0010_0000|524288|On-Chip RAM|To store application|
+  |0x0400_0000|67108863|SDRAM|To store application|
   |0x0000_0448|8|JTAG UART|Communication between a host PC and the Nios V processor system|
-  |0x0000_00440|8|System ID|Hardware configuration system ID (0x00000000)|
+  |0x0000_0440|8|System ID|Hardware configuration system ID (0x00000000)|
 
 
 ### User Flow 
