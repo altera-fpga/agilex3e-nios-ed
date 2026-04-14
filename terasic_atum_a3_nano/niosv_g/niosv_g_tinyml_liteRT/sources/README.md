@@ -19,13 +19,13 @@ This design demonstrates the TinyML application using LiteRT for microcontroller
 - **Device Part**: A3CZ135BB18AE7S
 - **Design Package**: atum_a3_nano_niosv_g_tinyml_liteRT.zip
 - **Category**: AI
-- **URL**: https://github.com/altera-fpga/agilex3c-nios-ed/blob/rel/26.1/niosv_g/tinyml_liteRT
+- **URL**: https://github.com/altera-fpga/agilex3c-nios-ed/blob/rel/26.1/terasic_atum_a3_nano/niosv_g/niosv_g_tinyml_liteRT
 - **downloadURL**:https://github.com/altera-fpga/agilex3c-nios-ed/releases/download/26.1/atum_a3_nano_niosv_g_tinyml_liteRT.zip
 
 ## Documentation
 
 - **Title**: Design Document 
-**URL**:   https://github.com/altera-fpga/agilex3c-nios-ed/blob/rel/26.1/niosv_g/tinyml_liteRT/docs/Niosv_g_Processor_TinyML_Design_on_Terasic_Atum_A3_Nano_FPGA.md
+**URL**:   https://github.com/altera-fpga/agilex3c-nios-ed/blob/rel/26.1/terasic_atum_a3_nano/niosv_g/niosv_g_tinyml_liteRT/docs/Niosv_g_Processor_TinyML_Design_on_Terasic_Atum_A3_Nano_FPGA.md
 
 # Getting Started
 
