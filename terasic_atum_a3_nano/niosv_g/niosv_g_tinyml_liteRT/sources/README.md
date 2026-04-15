@@ -90,7 +90,7 @@ make -C sw/tflite_app/build/Release
 d. Hardware Validation
 - Program the generated sof and then download the elf file on the board
 ```  
-quartus_pgm --cable=1 -m jtag -o 'p;ready_to_test/top.sof'
+quartus_pgm --cable=1 -m jtag -o 'p;ready_to_test/golden_top.sof'
 ```
 - Reduce the JTAG clock frequency to 6MHz before programming the application .elf file on the board.
 ``` 
