@@ -1,3 +1,30 @@
+package require ::quartus::project
+
+post_message [pwd]
+
+if {[is_project_open]} {
+  project_close
+}
+
+# Check that the right project is open
+set need_to_close_project 0
+if {[is_project_open]} {
+    if {[string compare $quartus(project) "top"]} {
+        puts "Project top is not open"
+        exit 1
+    }
+} else {
+    # Only open if not already open
+    if {[project_exists top]} {
+        project_open -revision top top
+        puts "Project top is open"
+    } else {
+        puts "Project top does not exist"
+        exit 1
+    }
+    set need_to_close_project 1
+}
+
 load_package vds
 # project_new top
 # 
@@ -115,3 +142,11 @@ vds::validate_system
 vds::save_system qsys_top
 
 post_message "Script completed successfully."
+
+# Close project
+if {$need_to_close_project} {
+ project_close
+}
+
+# cd ..
+post_message [pwd]
