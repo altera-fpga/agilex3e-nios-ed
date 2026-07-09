@@ -39,6 +39,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <string.h>
 #include <ctype.h>
 #include <signal.h>
 
@@ -62,7 +63,38 @@ static uint32_t ulTxErrors  = 0;
 static uint32_t ulTxDropped = 0;
 static uint32_t ulRxPackets = 0;
 static uint32_t ulRxDropped = 0;
+static uint32_t ulTxStatsPrint = 0;
 static BaseType_t xPhyLinkStatus = pdFALSE;
+
+#if ENABLE_MAC_LOOPBACK
+static void vMacLoopbackTxTask(void *pvParameters)
+{
+    MACAddress_t *pxMacAddress = (MACAddress_t *)pvParameters;
+    static uint8_t ucFrame[64] __attribute__((aligned(32)));
+    uint32_t ulSequence = 0;
+
+    memset(ucFrame, 0xA5, sizeof(ucFrame));
+    memset(&ucFrame[0], 0xFF, 6);
+    memcpy(&ucFrame[6], pxMacAddress->ucBytes, 6);
+    ucFrame[12] = 0x88;
+    ucFrame[13] = 0xB5;
+
+    for (;;)
+    {
+        ucFrame[14] = (uint8_t)(ulSequence >> 24);
+        ucFrame[15] = (uint8_t)(ulSequence >> 16);
+        ucFrame[16] = (uint8_t)(ulSequence >> 8);
+        ucFrame[17] = (uint8_t)ulSequence;
+
+        printf("[MAC LOOPBACK] raw frame %lu\n", ulSequence);
+        (void)msgdma_send_copy(ucFrame, sizeof(ucFrame));
+        dumpMACStats();
+
+        ulSequence++;
+        vTaskDelay(pdMS_TO_TICKS(1000));
+    }
+}
+#endif
 
 void vPrintEthernetStats(void)
 {
@@ -90,6 +122,13 @@ BaseType_t xNetworkInterfaceInitialise(NetworkInterface_t *pxInterface)
         }
         printf("Initializing MSGDMA\n");
         msgdma_init(pxInterface);                //Initialize MSGDMA
+
+#if ENABLE_MAC_LOOPBACK
+        static MACAddress_t xLoopbackMacAddress;
+        xLoopbackMacAddress = pxInterface->pxEndPoint->xMACAddress;
+        xTaskCreate(vMacLoopbackTxTask, "mac_loop", configMINIMAL_STACK_SIZE * 2,
+                    &xLoopbackMacAddress, tskIDLE_PRIORITY + 1, NULL);
+#endif
 
         xInitialised = pdTRUE;
     }
@@ -133,6 +172,7 @@ BaseType_t xNetworkInterfaceOutput(struct xNetworkInterface *pxNetworkInterface,
             if (txResult == 0)
             {
                 ulTxPackets++;
+                ulTxStatsPrint++;
                 xReturn = pdTRUE;
             }
             else
@@ -150,6 +190,7 @@ BaseType_t xNetworkInterfaceOutput(struct xNetworkInterface *pxNetworkInterface,
             if (txResult == 0)
             {
                 ulTxPackets++;
+                ulTxStatsPrint++;
                 xReturn = pdTRUE;
             }
             else
@@ -166,6 +207,11 @@ BaseType_t xNetworkInterfaceOutput(struct xNetworkInterface *pxNetworkInterface,
             printf("Cannot transmit - null buffer\n");
         printf("All dropped\n");
         ulTxDropped++;
+    }
+
+    if ((ulTxStatsPrint != 0U) && ((ulTxStatsPrint % 8U) == 0U))
+    {
+        dumpMACStats();
     }
 
     return xReturn;

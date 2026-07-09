@@ -49,7 +49,20 @@ os.chdir(cwd_2)
 cntr=0
 qpf_name = ''
 qsys_tcl = ''
-for file in glob.glob("*.tcl*"):
+qpf_tcl = ''
+qpf_tcl_dir = ''
+qsys_tcl_dir = ''
+
+# Prefer canonical script names when available.
+script_files = sorted(glob.glob("*.tcl*"))
+if "top.tcl" in script_files:
+    qpf_tcl = "top.tcl"
+    qpf_tcl_dir = "../scripts/" + qpf_tcl
+if "design_export.tcl" in script_files:
+    qsys_tcl = "design_export.tcl"
+    qsys_tcl_dir = "../scripts/" + qsys_tcl
+
+for file in script_files:
     if ".gz" in file:
         gz_unzip = subprocess.Popen("gzip -d {}".format(file),shell=True)
         gz_unzip.wait()
@@ -59,17 +72,20 @@ for file in glob.glob("*.tcl*"):
         line_f1 = f1.readlines()
         for i,line in enumerate(line_f1):
             if 'project_exists ' in line:
-                qpf_tcl = file
-                qpf_tcl_dir = "../scripts/" + qpf_tcl
+                if not qpf_tcl:
+                    qpf_tcl = file
+                    qpf_tcl_dir = "../scripts/" + qpf_tcl
                 qpf_name = line_f1[i].replace(" ","").split("project_exists",1)[1]
                 qpf_name = re.sub(r"[{}]",'',qpf_name).replace(']','').rstrip()
             elif 'project_new -overwrite' in line:
-                qpf_tcl = file
-                qpf_tcl_dir = "../scripts/" + qpf_tcl
+                if not qpf_tcl:
+                    qpf_tcl = file
+                    qpf_tcl_dir = "../scripts/" + qpf_tcl
                 qpf_name = line_f1[i].replace(" ","").split("project_new-overwrite",1)[1].rstrip()             
             elif ('create_system ' in line) or ('set sys_name ' in line):
-                qsys_tcl = file
-                qsys_tcl_dir = "../scripts/" + qsys_tcl
+                if not qsys_tcl:
+                    qsys_tcl = file
+                    qsys_tcl_dir = "../scripts/" + qsys_tcl
                 #qsys_name = line_f1[i].replace(" ","").split("create_system",1)[1]
  
 qpf_dir = qpf_name +".qpf"
@@ -95,11 +111,23 @@ generate_qpf.wait()
 #     logfile.write(line)
 # open_qpf.wait()
  
-# Generate qsys file
-generate_qsys = subprocess.Popen(["quartus_sh","-t",str(qsys_tcl_dir)], stdout=subprocess.PIPE, stderr=subprocess.STDOUT,cwd=cwd_1)
-for line in generate_qsys.stdout:
-    logfile.write(line)
-generate_qsys.wait()
+# Generate the VDS child IP descriptors from the tracked Platform Designer script.
+vds_ip_generator = os.path.join(cwd_2, "generate_vds_ip.sh")
+if os.path.exists(vds_ip_generator):
+    generate_vds_ip = subprocess.Popen([vds_ip_generator], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    for line in generate_vds_ip.stdout:
+        logfile.write(line)
+    generate_vds_ip.wait()
+    if generate_vds_ip.returncode != 0:
+        logfile.close()
+        sys.exit(generate_vds_ip.returncode)
+elif qsys_tcl_dir != '':
+    generate_qsys = subprocess.Popen(["quartus_sh","-t",str(qsys_tcl_dir)], stdout=subprocess.PIPE, stderr=subprocess.STDOUT,cwd=cwd_1)
+    for line in generate_qsys.stdout:
+        logfile.write(line)
+    generate_qsys.wait()
+else:
+    logfile.write(b"WARNING: No VDS child IP generator found. Continuing with existing generated files.\n")
  
 # # Generate qsys file
 # generate_qsys = subprocess.Popen(["qsys-script","--script={}".format(qsys_tcl_dir),"--quartus-project={}".format(qpf_dir)], stdout=subprocess.PIPE, stderr=subprocess.STDOUT,cwd=cwd_1)
@@ -115,11 +143,15 @@ generate_ip.wait()
  
 # quartus_sh --flow compile ${design_top}.qpf
  
-# Generate hex file
-app_creation = subprocess.Popen(["niosv-shell < scripts/niosv_app_creation.sh"], stdout=subprocess.PIPE, stderr=subprocess.STDOUT,shell= True)
-for line in app_creation.stdout:
-    logfile.write(line)
-app_creation.wait()
+# Generate hex file only if helper script is available.
+niosv_app_script = "scripts/niosv_app_creation.sh"
+if os.path.exists(niosv_app_script):
+    app_creation = subprocess.Popen(["niosv-shell < {}".format(niosv_app_script)], stdout=subprocess.PIPE, stderr=subprocess.STDOUT,shell= True)
+    for line in app_creation.stdout:
+        logfile.write(line)
+    app_creation.wait()
+else:
+    logfile.write(b"WARNING: scripts/niosv_app_creation.sh not found. Skipping niosv-shell step.\n")
  
  
 # # Compile Flow

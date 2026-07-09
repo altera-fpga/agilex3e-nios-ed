@@ -53,11 +53,45 @@
 #include "FreeRTOS_Routing.h"
 #include "NetworkInterface.h"
 #include "tse_driver.h"
+#include "colorbar_image.h"
+#include "desktop_background_image.h"
  
 #define PING_TASK_STACKSIZE 4096
-#define PING_TASK_PRIORITY  (configMAX_PRIORITIES - 1)
+#define PING_TASK_PRIORITY  (configMAX_PRIORITIES - 3)
+#define UDP_TASK_STACKSIZE  4096
+#define UDP_TASK_PRIORITY   (configMAX_PRIORITIES - 3)
+#define UDP_LOOPBACK_PORT   5002u
+#define UDP_LOOPBACK_BUFFER_BYTES 512u
+#define HTTP_TASK_STACKSIZE 4096
+#define HTTP_TASK_PRIORITY  (configMAX_PRIORITIES - 3)
+#define HTTP_SERVER_PORT    80u
+#define HTTP_REQUEST_BUFFER_BYTES 256u
  
 static TaskHandle_t xPingTaskHandle = NULL;
+static TaskHandle_t xUdpTaskHandle = NULL;
+static TaskHandle_t xHttpTaskHandle = NULL;
+
+#define NET_PROOF_ATTR __attribute__((used, section(".net_proof_status")))
+volatile uint32_t net_proof_magic NET_PROOF_ATTR = 0x4e455450u; /* NETP */
+volatile uint32_t net_proof_network_up NET_PROOF_ATTR = 0u;
+volatile uint32_t net_proof_ping_replies NET_PROOF_ATTR = 0u;
+volatile uint32_t net_proof_udp_sent NET_PROOF_ATTR = 0u;
+volatile uint32_t net_proof_udp_received NET_PROOF_ATTR = 0u;
+volatile uint32_t net_proof_udp_echoed NET_PROOF_ATTR = 0u;
+volatile uint32_t net_proof_udp_last_len NET_PROOF_ATTR = 0u;
+volatile uint32_t net_proof_udp_last_from NET_PROOF_ATTR = 0u;
+volatile uint32_t net_proof_udp_last_send_result NET_PROOF_ATTR = 0u;
+
+static const char cHttpBody[] =
+    "<!doctype html>\n"
+    "<html><head><meta charset=\"utf-8\"><title>Atum A3 Nano</title></head>\n"
+    "<body style=\"font-family:sans-serif;margin:24px;background:#0b1720;color:white\">\n"
+    "<h1>Atum A3 Nano</h1><p>FreeRTOS + TSE is serving HTML with inline images.</p>\n"
+    "<div style=\"width:640px;max-width:100%;padding:8px;background:#fff;border-radius:6px\">\n"
+    "<img src=\"" COLORBAR_SVG_DATA_URI "\" alt=\"Color bars\" style=\"display:block;width:100%;height:auto;margin-bottom:8px\">\n"
+    "<img src=\"" DESKTOP_BACKGROUND_JPG_DATA_URI "\" alt=\"Desktop background\" style=\"display:block;width:100%;height:auto\">\n"
+    "</div>\n"
+    "<p style=\"font-size:13px;color:#b8ccd8\">Images: generated color bars and ag3-wallpaper.png</p></body></html>\n";
  
 /* Called if a task overflows its stack */
 void vApplicationStackOverflowHook(TaskHandle_t pxTask, char *pcTaskName)
@@ -125,6 +159,211 @@ void vPingTestTask(void *pvParameters)
         //printf ("send ping request function\n");
     }
 }
+
+void vUdpLoopbackTask(void *pvParameters)
+{
+    Socket_t xSocket;
+    struct freertos_sockaddr xBindAddress;
+    struct freertos_sockaddr xSourceAddress;
+    socklen_t xSourceAddressLength;
+    const TickType_t xReceiveTimeout = pdMS_TO_TICKS(1000u);
+    const TickType_t xSendTimeout = pdMS_TO_TICKS(1000u);
+    char cRxBuffer[UDP_LOOPBACK_BUFFER_BYTES];
+
+    (void)pvParameters;
+    xUdpTaskHandle = xTaskGetCurrentTaskHandle();
+    ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+
+    xSocket = FreeRTOS_socket(FREERTOS_AF_INET, FREERTOS_SOCK_DGRAM, FREERTOS_IPPROTO_UDP);
+    if (xSocket == FREERTOS_INVALID_SOCKET) {
+        printf("[UDP] socket create failed\n");
+        vTaskDelete(NULL);
+    }
+
+    memset(&xBindAddress, 0, sizeof(xBindAddress));
+    xBindAddress.sin_len = sizeof(xBindAddress);
+    xBindAddress.sin_family = FREERTOS_AF_INET;
+    xBindAddress.sin_port = FreeRTOS_htons(UDP_LOOPBACK_PORT);
+    xBindAddress.sin_addr = 0;
+
+    if (FreeRTOS_bind(xSocket, &xBindAddress, sizeof(xBindAddress)) != 0) {
+        printf("[UDP] bind failed on port %u\n", UDP_LOOPBACK_PORT);
+        FreeRTOS_closesocket(xSocket);
+        vTaskDelete(NULL);
+    }
+
+    FreeRTOS_setsockopt(xSocket, 0, FREERTOS_SO_RCVTIMEO, &xReceiveTimeout, sizeof(xReceiveTimeout));
+    FreeRTOS_setsockopt(xSocket, 0, FREERTOS_SO_SNDTIMEO, &xSendTimeout, sizeof(xSendTimeout));
+
+    printf("[UDP] loopback task bound on FPGA port %u\n", UDP_LOOPBACK_PORT);
+
+    for (;;) {
+        int32_t lBytesReceived;
+
+        xSourceAddressLength = sizeof(xSourceAddress);
+        memset(&xSourceAddress, 0, sizeof(xSourceAddress));
+        lBytesReceived = FreeRTOS_recvfrom(xSocket,
+                                           cRxBuffer,
+                                           sizeof(cRxBuffer),
+                                           0,
+                                           &xSourceAddress,
+                                           &xSourceAddressLength);
+
+        if (lBytesReceived > 0) {
+            int32_t lEchoed;
+            net_proof_udp_received++;
+            net_proof_udp_last_len = (uint32_t)lBytesReceived;
+            net_proof_udp_last_from = xSourceAddress.sin_addr;
+
+            xSourceAddress.sin_len = sizeof(xSourceAddress);
+            xSourceAddress.sin_family = FREERTOS_AF_INET;
+            lEchoed = FreeRTOS_sendto(xSocket,
+                                      cRxBuffer,
+                                      (size_t)lBytesReceived,
+                                      0,
+                                      &xSourceAddress,
+                                      xSourceAddressLength);
+            net_proof_udp_last_send_result = (uint32_t)lEchoed;
+            if (lEchoed > 0) {
+                net_proof_udp_sent++;
+                net_proof_udp_echoed++;
+            }
+
+            printf("[UDP] loopback rx %ld bytes from 0x%08lX:%u, echo result %ld\n",
+                   (long)lBytesReceived,
+                   (unsigned long)xSourceAddress.sin_addr,
+                   FreeRTOS_ntohs(xSourceAddress.sin_port),
+                   (long)lEchoed);
+        }
+    }
+}
+
+static BaseType_t prvHttpSendAll(Socket_t xSocket, const char *pcBuffer, size_t uxLength)
+{
+    size_t uxSentTotal = 0u;
+
+    while (uxSentTotal < uxLength) {
+        BaseType_t xSent = FreeRTOS_send(xSocket,
+                                         pcBuffer + uxSentTotal,
+                                         uxLength - uxSentTotal,
+                                         0);
+        if (xSent <= 0) {
+            return xSent;
+        }
+        uxSentTotal += (size_t)xSent;
+    }
+
+    return (BaseType_t)uxSentTotal;
+}
+
+void vHttpServerTask(void *pvParameters)
+{
+    Socket_t xListenSocket;
+    struct freertos_sockaddr xBindAddress;
+    const TickType_t xReceiveTimeout = pdMS_TO_TICKS(3000u);
+    const TickType_t xSendTimeout = pdMS_TO_TICKS(3000u);
+
+    (void)pvParameters;
+    xHttpTaskHandle = xTaskGetCurrentTaskHandle();
+    ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+
+    xListenSocket = FreeRTOS_socket(FREERTOS_AF_INET, FREERTOS_SOCK_STREAM, FREERTOS_IPPROTO_TCP);
+    if (xListenSocket == FREERTOS_INVALID_SOCKET) {
+        printf("[HTTP] listen socket create failed\n");
+        vTaskDelete(NULL);
+    }
+
+    FreeRTOS_setsockopt(xListenSocket, 0, FREERTOS_SO_SNDTIMEO, &xSendTimeout, sizeof(xSendTimeout));
+
+    memset(&xBindAddress, 0, sizeof(xBindAddress));
+    xBindAddress.sin_len = sizeof(xBindAddress);
+    xBindAddress.sin_family = FREERTOS_AF_INET;
+    xBindAddress.sin_port = FreeRTOS_htons(HTTP_SERVER_PORT);
+    xBindAddress.sin_addr = 0;
+
+    if (FreeRTOS_bind(xListenSocket, &xBindAddress, sizeof(xBindAddress)) != 0) {
+        printf("[HTTP] bind failed on port %u\n", HTTP_SERVER_PORT);
+        FreeRTOS_closesocket(xListenSocket);
+        vTaskDelete(NULL);
+    }
+
+    if (FreeRTOS_listen(xListenSocket, 2) != 0) {
+        printf("[HTTP] listen failed on port %u\n", HTTP_SERVER_PORT);
+        FreeRTOS_closesocket(xListenSocket);
+        vTaskDelete(NULL);
+    }
+
+    printf("[HTTP] serving simple HTML on FPGA port %u\n", HTTP_SERVER_PORT);
+
+    for (;;) {
+        Socket_t xClientSocket;
+        struct freertos_sockaddr xClientAddress;
+        socklen_t xClientAddressLength = sizeof(xClientAddress);
+
+        memset(&xClientAddress, 0, sizeof(xClientAddress));
+        xClientSocket = FreeRTOS_accept(xListenSocket, &xClientAddress, &xClientAddressLength);
+        if ((xClientSocket == FREERTOS_INVALID_SOCKET) || (xClientSocket == NULL)) {
+            continue;
+        }
+
+        FreeRTOS_setsockopt(xClientSocket, 0, FREERTOS_SO_RCVTIMEO, &xReceiveTimeout, sizeof(xReceiveTimeout));
+        FreeRTOS_setsockopt(xClientSocket, 0, FREERTOS_SO_SNDTIMEO, &xSendTimeout, sizeof(xSendTimeout));
+
+        char cRequestBuffer[HTTP_REQUEST_BUFFER_BYTES];
+        BaseType_t xReceived = FreeRTOS_recv(xClientSocket,
+                                             cRequestBuffer,
+                                             sizeof(cRequestBuffer) - 1u,
+                                             0);
+        if (xReceived > 0) {
+            cRequestBuffer[xReceived] = '\0';
+        }
+
+        const char *pcContentType = "text/html; charset=utf-8";
+        const char *pcPayload = cHttpBody;
+        size_t uxPayloadLength = sizeof(cHttpBody) - 1u;
+        const char *pcRoute = "/";
+        if ((xReceived > 0) && (strncmp(cRequestBuffer, "GET /bg.jpg", 11u) == 0)) {
+            pcContentType = "image/jpeg";
+            pcPayload = (const char *)gDesktopBackgroundJpg;
+            uxPayloadLength = (size_t)gDesktopBackgroundJpgLen;
+            pcRoute = "/bg.jpg";
+        }
+
+        char cHeader[192];
+        int lHeaderLength = snprintf(cHeader,
+                                     sizeof(cHeader),
+                                     "HTTP/1.1 200 OK\r\n"
+                                     "Content-Type: %s\r\n"
+                                     "Content-Length: %u\r\n"
+                                     "Connection: close\r\n"
+                                     "Cache-Control: no-store\r\n"
+                                     "\r\n",
+                                     pcContentType,
+                                     (unsigned)uxPayloadLength);
+        BaseType_t xHeaderSent = -1;
+        BaseType_t xBodySent = -1;
+        if ((lHeaderLength > 0) && ((size_t)lHeaderLength < sizeof(cHeader))) {
+            xHeaderSent = prvHttpSendAll(xClientSocket, cHeader, (size_t)lHeaderLength);
+            if (xHeaderSent == lHeaderLength) {
+                xBodySent = prvHttpSendAll(xClientSocket, pcPayload, uxPayloadLength);
+            }
+        }
+        printf("[HTTP] request %s from 0x%08lX:%u rx %ld header %ld body %ld\n",
+               pcRoute,
+               (unsigned long)xClientAddress.sin_addr,
+               FreeRTOS_ntohs(xClientAddress.sin_port),
+               (long)xReceived,
+               (long)xHeaderSent,
+               (long)xBodySent);
+
+        if (xBodySent > 0) {
+            vTaskDelay(pdMS_TO_TICKS(1000u));
+        }
+        FreeRTOS_shutdown(xClientSocket, FREERTOS_SHUT_RDWR);
+        vTaskDelay(pdMS_TO_TICKS(250u));
+        FreeRTOS_closesocket(xClientSocket);
+    }
+}
  
 BaseType_t xApplicationGetRandomNumber( uint32_t *pulNumber )
 {
@@ -159,6 +398,7 @@ BaseType_t xApplicationDNSQueryHook(const char *pcName)
 void vApplicationPingReplyHook(ePingReplyStatus_t eStatus, uint16_t usIdentifier) {
     switch (eStatus) {
         case eSuccess:
+            net_proof_ping_replies++;
             printf("[Ping] Reply received: Identifier %u\n", usIdentifier);
             //vPrintEthernetStats();
             break;
@@ -181,6 +421,7 @@ void vApplicationIPNetworkEventHook( eIPCallbackEvent_t eNetworkEvent )
     if (eNetworkEvent == eNetworkUp)
     {
         FreeRTOS_printf(("Network is UP!\n"));
+        net_proof_network_up++;
  
         uint32_t ulIPAddress, ulNetMask, ulGatewayAddress, ulDNSServerAddress;  
         FreeRTOS_GetAddressConfiguration(
@@ -205,7 +446,15 @@ void vApplicationIPNetworkEventHook( eIPCallbackEvent_t eNetworkEvent )
         FreeRTOS_inet_ntoa( ulDNSServerAddress, cBuffer );  
         printf( "DNS server IP Address: %s\n", cBuffer ); 
     }
-    xTaskNotifyGive(xPingTaskHandle);
+    if (xPingTaskHandle != NULL) {
+        xTaskNotifyGive(xPingTaskHandle);
+    }
+    if (xUdpTaskHandle != NULL) {
+        xTaskNotifyGive(xUdpTaskHandle);
+    }
+    if (xHttpTaskHandle != NULL) {
+        xTaskNotifyGive(xHttpTaskHandle);
+    }
 }
  
 BaseType_t vInitialiseNetworkInterface()
@@ -241,13 +490,13 @@ int main(void)
     if (pdFAIL == xTaskCreate( vPingTestTask, "vPingTestTask", PING_TASK_STACKSIZE, NULL, PING_TASK_PRIORITY, &xPingTaskHandle)){
 		printf("Ping Task creation fail!!!!\n");
 	}
+    if (pdFAIL == xTaskCreate( vUdpLoopbackTask, "vUdpLoopbackTask", UDP_TASK_STACKSIZE, NULL, UDP_TASK_PRIORITY, &xUdpTaskHandle)){
+		printf("UDP Task creation fail!!!!\n");
+	}
+    if (pdFAIL == xTaskCreate( vHttpServerTask, "vHttpServerTask", HTTP_TASK_STACKSIZE, NULL, HTTP_TASK_PRIORITY, &xHttpTaskHandle)){
+		printf("HTTP Task creation fail!!!!\n");
+	}
 	vTaskStartScheduler();
  
 	for( ;; );
 }
-
-
-
-
-
-

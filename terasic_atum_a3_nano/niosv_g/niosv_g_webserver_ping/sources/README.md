@@ -1,20 +1,32 @@
-# Nios® V/g Ping System Example Design 
+# Nios® V/g 1000M HTTP Server Example Design 
 
- This design demonstrates the Ping application on a Nios® V/g processor using the Triple Speed Ethernet IP for the Atum A3 Nano FPGA board.
+This design demonstrates a simple HTML HTTP server on a Nios® V/g processor
+using the Triple Speed Ethernet IP for the Atum A3 Nano FPGA board.
 
 ## Description
 
-The System Example Design demonstrates ping application. The Nios V/g acts as the core. The Triple Speed Ethernet (TSE) IP is configured in RGMII mode and connectes to the onboard DP83867IR TI PHY via RGMII interface. 
+The System Example Design demonstrates a 1000M full-duplex Ethernet
+application. The Nios V/g acts as the core. The Triple Speed Ethernet (TSE) IP
+is configured in RGMII mode and connects to the onboard DP83867IR TI PHY via
+RGMII interface.
 
 The design has 2 MSGDMA IPs configured in Memory Mapped to Stream (MM2S) mode for Transmission and Stream to Memory Mapped (S2MM) mode for Reception.
 
 To test the application, connect the RGMII Interface of the Atum A3 Nano FPGA board to the Link Partner using RJ-45 cable.
 
+Default network settings:
+
+```text
+FPGA IP address: 10.0.0.2
+Host IP address: 10.0.0.1
+HTTP port: 80
+UDP loopback port: 5002
+```
+
 Ensure that the IP addresses are modified accordingly in the application code under the following location - sw/app_freertos/main.c
 
-Once the application binaries are downloaded (See section 3.d below for the steps), the board starts pinging the link partner automatically.
-
-Observe the Ping Request and Response prints on the terminal.
+Once the application binaries are downloaded, the board starts pinging the link
+partner automatically and serves a simple HTML page at `http://10.0.0.2/`.
 
 This design is created on the Quartus Visual Designer Studio. Fore more Information please visit here Visual Designer Studio[https://www.altera.com/products/development-tools/visual-designer-studio].
 
@@ -22,11 +34,18 @@ This design is created on the Quartus Visual Designer Studio. Fore more Informat
 ![image](https://github.com/altera-fpga/agilex3c-nios-ed/blob/rel/26.1/terasic_atum_a3_nano/niosv_g/niosv_g_webserver_ping/img/web_server_block_diagram.png)
 
 
-## Manual update of the TSE and MSGDMA driver code
+## TSE and MSGDMA driver overlay
 
 For 26.1, when the user builds the Niosv BSP, the driver code for TSE and MSGDMA are not compatible with Agilex 3.
 
-To ensure the correct files are picked, please do the following steps:
+Use the checked-in software build script so the generated BSP receives the
+validated AlteraTSE driver overlay and FreeRTOS TCP/IP config:
+
+```sh
+./scripts/build_sw_http_server.sh
+```
+
+Manual flow, if needed:
 
 1. Create the BSP manually by running the command in section 3.c below
 
@@ -34,20 +53,22 @@ To ensure the correct files are picked, please do the following steps:
 
 3. Replace it with the AlteraTSE folder shared with the package .zip or uploaded under sources/sw in github repository.
 
-4. Run the app creation , cmake and make commands from section 3c below. Do not re-generate BSP as it will overwrite the replaced driver files.
+4. Copy `sw/FreeRTOSIPConfig.h` to `sw/bsp_freertos/FreeRTOS_TCP_IP/source/include/FreeRTOSIPConfig.h`.
+
+5. Run the app creation, cmake and make commands from section 3c below. Do not re-generate BSP as it will overwrite the replaced driver files.
 
 
 ## Link Partner settings
 
 1. Set the following setting on the interface of the link partner
 
-    Speed- 100 Mbps
+    Speed- 1000 Mbps
 
     Duplex- Full
 
-    Auto-Negotiation- Off
+    Auto-Negotiation- On
 
-command: ethtool -s <interface_name> speed 100 duplex full autoneg off
+command: ethtool -s <interface_name> speed 1000 duplex full autoneg on
 
 
 ## Expected Output
@@ -58,7 +79,19 @@ Board IP address: 10.0.0.2
 
 Link partner (linux host) IP address: 10.0.0.1
 
-Speed: 100Mbps
+Speed: 1000Mbps
+
+Expected validation markers:
+
+```text
+PHY resolved: speed=1000M duplex=full
+TSE MAC speed config: eth_mode=1 ena_10=0
+4 packets transmitted, 4 received, 0% packet loss
+HTTP_FETCH_STATUS attempt=1 HTTP/1.1 200 OK
+HTTP_FETCH_RESULT PASS
+frames_check_sequence_errors = 0x0
+alignment_errors = 0x0
+```
 
 ![image](https://github.com/altera-fpga/agilex3c-nios-ed/blob/rel/26.1/terasic_atum_a3_nano/niosv_g/niosv_g_webserver_ping/img/expected_output.png)
 
@@ -129,11 +162,32 @@ b. Using build_sof.py to compile the design
 
 - Run the following command in the terminal from top level project directory:
 ```
-cp custom_logic/emif_axi_adaptor_hw.tcl ./hw
-cp custom_logic/emif_axi_handler.sv ./hw 
+export LM_LICENSE_FILE=/home/dev/License.dat
+cp custom_logic/core_sdram_axi/core_sdram_axi4_hw.tcl ./hw
+cp custom_logic/core_sdram_axi/sdram_axi.v ./hw
+cp custom_logic/core_sdram_axi/sdram_axi_core.v ./hw
+cp custom_logic/core_sdram_axi/sdram_axi_pmem.v ./hw
 quartus_py ./scripts/build_sof.py
 ```
 - The quartus tool will compile the design and generate the output files
+
+The VDS system file is tracked, while the VDS child IP files under
+`hw/src/vds/qsys_top/ip/` are generated build outputs. `build_sof.py` runs
+`scripts/generate_vds_ip.sh` automatically before `quartus_ipgenerate`.
+
+For a deterministic hardware build from a clean workspace, this command sequence is validated:
+```
+export LM_LICENSE_FILE=/home/dev/License.dat
+cp custom_logic/core_sdram_axi/core_sdram_axi4_hw.tcl ./hw
+cp custom_logic/core_sdram_axi/sdram_axi.v ./hw
+cp custom_logic/core_sdram_axi/sdram_axi_core.v ./hw
+cp custom_logic/core_sdram_axi/sdram_axi_pmem.v ./hw
+cd hw
+quartus_sh -t ../scripts/top.tcl
+../scripts/generate_vds_ip.sh
+quartus_ipgenerate top.qpf
+quartus_sh --flow compile top
+```
 
 c. Creating the bsp, build software sources and download elf
 - To create software app, run the following commands in the terminal:
@@ -141,33 +195,27 @@ c. Creating the bsp, build software sources and download elf
 - Clean the app build project before regenerating elf
 
 ```     
-niosv-bsp --create --no-default --system=./hw/src/vds/qsys_top/qsys_top.vds --quartus_project=./hw/top.qpf --type=freertos -cmd="enable_sw_package altera_freertos_tcpip"  ./sw/bsp_freertos/settings.bsp --script=./sw/bsp_settings.tcl
-niosv-app --bsp-dir=sw/bsp_freertos --app-dir=sw/app_freertos --srcs=sw/app_freertos/main.c
-cmake -S ./sw/app_freertos -B sw/app_freertos/build
-make -C sw/app_freertos/build
+./scripts/build_sw_http_server.sh
 ```
 Note:The software can be compiled using the Ashling Visual Studio Code Extension for Altera FPGAs
 
 For information on the build process, please refer to the following document- [Ashling VSCode Extension](https://www.intel.com/content/www/us/en/docs/programmable/730783/current/ashling-visual-studio-code-extension.html)
 
 d. Hardware Validation
-- Program the generated sof and then download the elf file on the board
-```        
-quartus_pgm --cable=1 -m jtag -o 'p;ready_to_test/top.sof'
-``` 
-- Reduce the JTAG clock frequency to 6MHz before programming the application .elf file on the board.
+
+The TSE IP is time-limited in FPGA IP Evaluation Mode, so keep
+`quartus_pgm` open during runtime validation. From the parent design directory:
+
+```sh
+./run_tse_eval_http_server.sh
 ```
-jtagconfig --setparam 1 JtagClock 6M
+
+The full clean build plus hardware validation is:
+
+```sh
+./run_tse_eval_http_full.sh
 ```
-- Toggle the In-System-Sources and Probe (ISSP) IP to initialize PHY and set it to 100M.
-```
-quartus_stp -t ready_to_test/toggle_issp.tcl
-```
-- Download the elf file on the board 
-```    
-niosv-download -g -r ready_to_test/app_freertos.elf -c 1
-``` 
-- Verify the output on the terminal by using the following command in the terminal:
-``` 
-juart-terminal -d 1 -c 1 -i 0 
-```
+
+The script programs the time-limited SOF, holds the eval prompt open, sets the
+JTAG clock to 6 MHz, forces 1000M ISSP mode, downloads the ELF, captures JTAG
+UART, pings the FPGA, fetches the HTML page, and closes the eval prompt.

@@ -136,7 +136,7 @@ https://fpgasoftware.intel.com/eula.-->
           <ipxact:vectors>
             <ipxact:vector>
               <ipxact:left>0</ipxact:left>
-              <ipxact:right>2</ipxact:right>
+              <ipxact:right>17</ipxact:right>
             </ipxact:vector>
           </ipxact:vectors>
           <ipxact:wireTypeDefs>
@@ -181,7 +181,7 @@ https://fpgasoftware.intel.com/eula.-->
         <ipxact:parameter parameterId="probe_width" type="int">
           <ipxact:name>probe_width</ipxact:name>
           <ipxact:displayName>Probe Port Width [0..511]</ipxact:displayName>
-          <ipxact:value>3</ipxact:value>
+          <ipxact:value>18</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="source_width" type="int">
           <ipxact:name>source_width</ipxact:name>
@@ -191,7 +191,7 @@ https://fpgasoftware.intel.com/eula.-->
         <ipxact:parameter parameterId="source_initial_value" type="string">
           <ipxact:name>source_initial_value</ipxact:name>
           <ipxact:displayName>Hexadecimal initial value for the Source Port</ipxact:displayName>
-          <ipxact:value>0</ipxact:value>
+          <ipxact:value>3</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="create_source_clock" type="bit">
           <ipxact:name>create_source_clock</ipxact:name>
