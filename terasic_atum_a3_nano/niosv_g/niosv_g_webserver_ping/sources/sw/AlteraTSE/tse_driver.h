@@ -43,7 +43,9 @@
 
 #define SPEED_SHIFT			14
 
+#ifndef ENABLE_MAC_LOOPBACK
 #define ENABLE_MAC_LOOPBACK	0
+#endif
 
 /* Rx FIFO default settings */
 #define ALTERA_TSE_RX_SECTION_EMPTY     MAX_FIFO_SIZE - 16
@@ -104,6 +106,7 @@ static inline alt_u16 read_phy_register(alt_u32 base, alt_u32 reg_offset) {
 
 BaseType_t tse_mac_phy_init(MACAddress_t mac_address);
 BaseType_t tse_phy_link_up(void);
+void dumpMACStats(void);
 
 /* MAC register Space. Note that some of these registers may or may not be
  * present depending upon options chosen by the user when the core was
@@ -297,9 +300,15 @@ struct altera_tse_mac {
 
 enum phy_reg_offset {
 	BASIC_MODE_CONTROL_REGISTER = 0X00,
+	BASIC_MODE_STATUS_REGISTER = 0x01,
 	RGMII_PHY_ID_1 = 0x02,
 	RGMII_PHY_ID_2 = 0x03,
+	AUTO_NEGOTIATION_ADVERTISEMENT_REGISTER = 0x04,
+	AUTO_NEGOTIATION_LINK_PARTNER_ABILITY_REGISTER = 0x05,
+	GIGABIT_CONTROL_REGISTER = 0x09,
+	GIGABIT_STATUS_REGISTER = 0x0A,
 	PHY_STATUS_REGISTER = 0X11,
+	BISCR_REGISTER = 0x16,
 	REGISTER_CONTROL_REGISTER = 0xD,
 	ADDRESS_OR_DATA_REGISTER = 0xE,
 	RGMII_CONTROL_REGISTER = 0x32,
@@ -316,6 +325,26 @@ enum basic_mode_control_register {
 	AUTO_NEGOTIATION_ENABLE = BIT(12),
 	SD_LOOPBACK = BIT(14),
 	RESET = BIT(15),
+};
+
+enum basic_mode_status_register {
+	LINK_STATUS = BIT(2),
+	AUTO_NEGOTIATION_COMPLETE = BIT(5),
+};
+
+enum auto_negotiation_advertisement_register {
+	ANAR_SELECTOR_802_3 = BIT(0),
+	ANAR_10_HALF = BIT(5),
+	ANAR_10_FULL = BIT(6),
+	ANAR_100_HALF = BIT(7),
+	ANAR_100_FULL = BIT(8),
+	ANAR_PAUSE = BIT(10),
+	ANAR_ASYM_PAUSE = BIT(11),
+};
+
+enum gigabit_control_register {
+	GBCR_1000_FULL = BIT(9),
+	GBCR_1000_HALF = BIT(8),
 };
 
 enum rgmii_copper_specific_status_reg {
@@ -347,7 +376,16 @@ enum rgmii_delay_control_register {
 	RGMII_TX_DELAY_CTRL_BIT3 = BIT (7),
 };
 
+#define DP83867_MMD_DEVADDR		0x1F
+#define DP83867_LOOPCR_REGISTER		0x00FE
+#define DP83867_LOOPCR_NORMAL		0xE721
+#define BISCR_LOOPBACK_MODE_MASK	(BIT(5) | BIT(6))
 
 #define LINK_STATUS_MASK	(COPPER_LINK_STATUS)
+#define PHYSTS_SPEED_MASK	(BIT(15) | BIT(14))
+#define PHYSTS_SPEED_1000	BIT(15)
+#define PHYSTS_SPEED_100	BIT(14)
+#define PHYSTS_DUPLEX_FULL	BIT(13)
+#define ANAR_ADVERTISE_ALL	(ANAR_SELECTOR_802_3 | ANAR_10_HALF | ANAR_10_FULL | ANAR_100_HALF | ANAR_100_FULL | ANAR_PAUSE | ANAR_ASYM_PAUSE)
 
 #endif

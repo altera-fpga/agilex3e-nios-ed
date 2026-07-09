@@ -74,20 +74,20 @@ if {$make_assignments} {
 	set_global_assignment -name VERILOG_FILE sdram_axi_core.v
 	set_global_assignment -name IP_FILE reset_release.ip
 	set_global_assignment -name IP_FILE issp.ip
-	set_global_assignment -name IP_SEARCH_PATHS /nfs/site/disks/swuser_work_sgosavi/Example_Designs/26.1/vds/terasic_niosv_tse_ping_vds/custom_logic/core_sdram_axi/**/*
+	set_global_assignment -name IP_SEARCH_PATHS "../custom_logic/core_sdram_axi/**/*"
 	set_global_assignment -name VDS_FILE src/vds/qsys_top/qsys_top.vds -tag "vds::qsys_top"
 	set_global_assignment -name VDS_IP_FILE src/vds/qsys_top/ip/qsys_top_core_sdram_axi4_0.ip -tag "vds::qsys_top"
-	set_global_assignment -name VDS_IP_FILE src/vds/qsys_top/ip/qsys_top_intel_niosv_g_0.ip -tag "vds::qsys_top"
-	set_global_assignment -name VDS_IP_FILE src/vds/qsys_top/ip/qsys_top_clock_bridge_1.ip -tag "vds::qsys_top"
-	set_global_assignment -name VDS_IP_FILE src/vds/qsys_top/ip/qsys_top_reset_bridge_1.ip -tag "vds::qsys_top"
-	set_global_assignment -name VDS_IP_FILE src/vds/qsys_top/ip/qsys_top_clock_bridge_2.ip -tag "vds::qsys_top"
-	set_global_assignment -name VDS_IP_FILE src/vds/qsys_top/ip/qsys_top_reset_bridge_2.ip -tag "vds::qsys_top"
-	set_global_assignment -name VDS_IP_FILE src/vds/qsys_top/ip/qsys_top_intel_onchip_memory_1.ip -tag "vds::qsys_top"
-	set_global_assignment -name VDS_IP_FILE src/vds/qsys_top/ip/qsys_top_intel_onchip_memory_0.ip -tag "vds::qsys_top"
-	set_global_assignment -name VDS_IP_FILE src/vds/qsys_top/ip/qsys_top_jtag_uart_0.ip -tag "vds::qsys_top"
-	set_global_assignment -name VDS_IP_FILE src/vds/qsys_top/ip/qsys_top_intel_eth_tse_0.ip -tag "vds::qsys_top"
-	set_global_assignment -name VDS_IP_FILE src/vds/qsys_top/ip/qsys_top_msgdma_1.ip -tag "vds::qsys_top"
-	set_global_assignment -name VDS_IP_FILE src/vds/qsys_top/ip/qsys_top_msgdma_0.ip -tag "vds::qsys_top"
+	set_global_assignment -name VDS_IP_FILE src/vds/qsys_top/ip/qsys_top_intel_niosv_g_4.ip -tag "vds::qsys_top"
+	set_global_assignment -name VDS_IP_FILE src/vds/qsys_top/ip/qsys_top_proc_clk.ip -tag "vds::qsys_top"
+	set_global_assignment -name VDS_IP_FILE src/vds/qsys_top/ip/qsys_top_proc_rst.ip -tag "vds::qsys_top"
+	set_global_assignment -name VDS_IP_FILE src/vds/qsys_top/ip/qsys_top_sdram_clock.ip -tag "vds::qsys_top"
+	set_global_assignment -name VDS_IP_FILE src/vds/qsys_top/ip/qsys_top_sdram_reset.ip -tag "vds::qsys_top"
+	set_global_assignment -name VDS_IP_FILE src/vds/qsys_top/ip/qsys_top_sys_cpu_ram.ip -tag "vds::qsys_top"
+	set_global_assignment -name VDS_IP_FILE src/vds/qsys_top/ip/qsys_top_sys_desc_mem.ip -tag "vds::qsys_top"
+	set_global_assignment -name VDS_IP_FILE src/vds/qsys_top/ip/qsys_top_sys_jtag_uart.ip -tag "vds::qsys_top"
+	set_global_assignment -name VDS_IP_FILE src/vds/qsys_top/ip/qsys_top_sys_tse.ip -tag "vds::qsys_top"
+	set_global_assignment -name VDS_IP_FILE src/vds/qsys_top/ip/qsys_top_sys_tse_msgdma_rx.ip -tag "vds::qsys_top"
+	set_global_assignment -name VDS_IP_FILE src/vds/qsys_top/ip/qsys_top_sys_tse_msgdma_tx.ip -tag "vds::qsys_top"
 	set_instance_assignment -name PARTITION_COLOUR 4289977599 -to top -entity top
 	set_instance_assignment -name PARTITION_COLOUR 4285964287 -to auto_fab_0 -entity top
 	set_location_assignment PIN_K43 -to CLK_50M

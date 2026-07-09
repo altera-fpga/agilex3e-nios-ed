@@ -42,34 +42,61 @@ void phy_reset()
     alt_u16 phy_reg = 0x0;
     phy_reg |= RESET;
     write_phy_register(TSE_MAC_BASE_ADDRESS, BASIC_MODE_CONTROL_REGISTER, phy_reg);
-    vTaskDelay(pdMS_TO_TICKS(10000));
+    vTaskDelay(pdMS_TO_TICKS(100));
+}
+
+static alt_u16 dp83867_read_mmd(alt_u16 reg)
+{
+    write_phy_register(TSE_MAC_BASE_ADDRESS, REGISTER_CONTROL_REGISTER, DP83867_MMD_DEVADDR);
+    write_phy_register(TSE_MAC_BASE_ADDRESS, ADDRESS_OR_DATA_REGISTER, reg);
+    write_phy_register(TSE_MAC_BASE_ADDRESS, REGISTER_CONTROL_REGISTER,
+                       FUNCTION_BIT14 | DP83867_MMD_DEVADDR);
+
+    return read_phy_register(TSE_MAC_BASE_ADDRESS, ADDRESS_OR_DATA_REGISTER);
+}
+
+static void dp83867_write_mmd(alt_u16 reg, alt_u16 value)
+{
+    write_phy_register(TSE_MAC_BASE_ADDRESS, REGISTER_CONTROL_REGISTER, DP83867_MMD_DEVADDR);
+    write_phy_register(TSE_MAC_BASE_ADDRESS, ADDRESS_OR_DATA_REGISTER, reg);
+    write_phy_register(TSE_MAC_BASE_ADDRESS, REGISTER_CONTROL_REGISTER,
+                       FUNCTION_BIT14 | DP83867_MMD_DEVADDR);
+    write_phy_register(TSE_MAC_BASE_ADDRESS, ADDRESS_OR_DATA_REGISTER, value);
+}
+
+static void dp83867_clear_diagnostics()
+{
+    alt_u16 bmcr = read_phy_register(TSE_MAC_BASE_ADDRESS, BASIC_MODE_CONTROL_REGISTER);
+    alt_u16 biscr = read_phy_register(TSE_MAC_BASE_ADDRESS, BISCR_REGISTER);
+
+    bmcr &= ~SD_LOOPBACK;
+    write_phy_register(TSE_MAC_BASE_ADDRESS, BASIC_MODE_CONTROL_REGISTER, bmcr);
+
+    biscr &= ~BISCR_LOOPBACK_MODE_MASK;
+    write_phy_register(TSE_MAC_BASE_ADDRESS, BISCR_REGISTER, biscr);
+
+    dp83867_write_mmd(DP83867_LOOPCR_REGISTER, DP83867_LOOPCR_NORMAL);
+    printf("DP83867 diag clear: BMCR=0x%04X BISCR=0x%04X LOOPCR=0x%04X\n",
+           read_phy_register(TSE_MAC_BASE_ADDRESS, BASIC_MODE_CONTROL_REGISTER),
+           read_phy_register(TSE_MAC_BASE_ADDRESS, BISCR_REGISTER),
+           dp83867_read_mmd(DP83867_LOOPCR_REGISTER));
 }
 
 BaseType_t phy_init_rgmii()
 {
-    alt_u16 phy_reg,phy_reg1 = 0x0;
-    alt_u16 status_reg = 0x0;
-    alt_u16 real_time_link_status= 0x0;
+    alt_u16 bmsr = 0x0;
+    alt_u16 real_time_link_status = 0x0;
     BaseType_t xReturn = pdFAIL;
-    
-    for (alt_32 i = 0; i < 10; i++) {
 
-        //Reset
-        //phy_reset();
+    phy_reset();
+    dp83867_clear_diagnostics();
+    printf("Configuring DP83867 autonegotiation; requiring 1000M full-duplex link\n");
+    write_phy_register(TSE_MAC_BASE_ADDRESS, AUTO_NEGOTIATION_ADVERTISEMENT_REGISTER, ANAR_ADVERTISE_ALL);
+    write_phy_register(TSE_MAC_BASE_ADDRESS, GIGABIT_CONTROL_REGISTER, GBCR_1000_FULL | GBCR_1000_HALF);
+    write_phy_register(TSE_MAC_BASE_ADDRESS, BASIC_MODE_CONTROL_REGISTER,
+                       AUTO_NEGOTIATION_ENABLE | RESTART_AUTO_NEGOTIATION);
 
-        phy_reg = read_phy_register(TSE_MAC_BASE_ADDRESS, BASIC_MODE_CONTROL_REGISTER);
-        //setting speed to 100M
-        phy_reg &= ~SPEED_SELECTION0;
-        phy_reg |= SPEED_SELECTION1;
-        //Set Duplex mode
-        phy_reg |= DUPLEX_MODE;
-        //Disable Autonegotiation
-        phy_reg &= ~AUTO_NEGOTIATION_ENABLE;
-        write_phy_register(TSE_MAC_BASE_ADDRESS, BASIC_MODE_CONTROL_REGISTER, phy_reg);
-
-     
-
-
+    for (alt_32 i = 0; i < 20; i++) {
         unsigned int rgmiictrl1, rgmiictrl2,rgmiictrl3= 0x0;
         rgmiictrl1 = read_phy_register(TSE_MAC_BASE_ADDRESS, REGISTER_CONTROL_REGISTER);
         rgmiictrl1 = DEVAD_BIT0|DEVAD_BIT1|DEVAD_BIT2|DEVAD_BIT3|DEVAD_BIT4;
@@ -107,8 +134,10 @@ BaseType_t phy_init_rgmii()
         printf ("RGMII ADDAR value is 0x%08X \n:", read_phy_register(TSE_MAC_BASE_ADDRESS, ADDRESS_OR_DATA_REGISTER));
 
 
+        (void) read_phy_register(TSE_MAC_BASE_ADDRESS, BASIC_MODE_STATUS_REGISTER);
+        bmsr = read_phy_register(TSE_MAC_BASE_ADDRESS, BASIC_MODE_STATUS_REGISTER);
         real_time_link_status = read_phy_register(TSE_MAC_BASE_ADDRESS, PHY_STATUS_REGISTER);
-        printf("Real time Link Status: 0x%08X\n", real_time_link_status);
+        printf("BMSR: 0x%04X PHYSTS: 0x%04X\n", bmsr, real_time_link_status);
 
         if (tse_phy_link_up()) {
             printf("Link up successful\n");
@@ -118,11 +147,20 @@ BaseType_t phy_init_rgmii()
             printf("Link up failed. Attempt %ld\n", i);
             xReturn = pdFAIL;
         }
+        vTaskDelay(pdMS_TO_TICKS(500));
     }
 
-    if (real_time_link_status & SPEED_DUPLEX_RESOLVED) {
-        printf("Speed and duplex resolved\n");
-        xReturn = pdPASS;
+    if (xReturn == pdPASS && (real_time_link_status & SPEED_DUPLEX_RESOLVED)) {
+        printf("PHY resolved: speed=%s duplex=%s PHYSTS=0x%04X\n",
+               ((real_time_link_status & PHYSTS_SPEED_MASK) == PHYSTS_SPEED_1000) ? "1000M" :
+               ((real_time_link_status & PHYSTS_SPEED_MASK) == PHYSTS_SPEED_100) ? "100M" : "10M",
+               (real_time_link_status & PHYSTS_DUPLEX_FULL) ? "full" : "half",
+               real_time_link_status);
+        if (((real_time_link_status & PHYSTS_SPEED_MASK) != PHYSTS_SPEED_1000) ||
+            ((real_time_link_status & PHYSTS_DUPLEX_FULL) == 0)) {
+            printf("PHY did not resolve required 1000M full-duplex mode\n");
+            xReturn = pdFAIL;
+        }
     } else {
         printf("Speed and duplex not resolved\n");
         xReturn = pdFAIL;
@@ -172,14 +210,18 @@ void tse_mac_init(MACAddress_t mac_address)
 
     cmd_cfg = TSE_MAC_REGISTERS->command_config;
 
-    cmd_cfg &= ~MAC_CMDCFG_ETH_SPEED; //changed eth speed to 100M
+    cmd_cfg |= MAC_CMDCFG_ETH_SPEED;
+    cmd_cfg &= ~MAC_CMDCFG_ENA_10;
     cmd_cfg &= ~MAC_CMDCFG_HD_ENA;
     cmd_cfg |= MAC_CMDCFG_PAD_EN;
     cmd_cfg &= ~MAC_CMDCFG_CRC_FWD;
     cmd_cfg |= MAC_CMDCFG_TX_ADDR_INS;
     cmd_cfg &= ~MAC_CMDCFG_TX_ADDR_SEL(111);
+    cmd_cfg &= ~MAC_CMDCFG_LOOP_ENA;
 
     TSE_MAC_REGISTERS->command_config = cmd_cfg;
+    printf("TSE MAC speed config: eth_mode=1 ena_10=0 hd_ena=0 cmd=0x%08lX\n",
+           (unsigned long)cmd_cfg);
 
     //SW Reset
     cmd_cfg = TSE_MAC_REGISTERS->command_config;
@@ -236,7 +278,12 @@ BaseType_t tse_mac_phy_init(MACAddress_t mac_addr)
 }
 
 BaseType_t tse_phy_link_up() {
-    return (((read_phy_register(TSE_MAC_BASE_ADDRESS, PHY_STATUS_REGISTER)) & LINK_STATUS_MASK) == LINK_STATUS_MASK);
+    (void) read_phy_register(TSE_MAC_BASE_ADDRESS, BASIC_MODE_STATUS_REGISTER);
+    alt_u16 bmsr = read_phy_register(TSE_MAC_BASE_ADDRESS, BASIC_MODE_STATUS_REGISTER);
+    alt_u16 physts = read_phy_register(TSE_MAC_BASE_ADDRESS, PHY_STATUS_REGISTER);
+
+    return (((physts & LINK_STATUS_MASK) == LINK_STATUS_MASK) ||
+            ((bmsr & LINK_STATUS) == LINK_STATUS)) ? pdTRUE : pdFALSE;
 }
 
 void dumpMACStats() {

@@ -12,5 +12,4 @@ start_insystem_source_probe  -hardware_name $hw_name -device_name $dev_name
 #write_source_data -instance_index $ISSP_INDEX_0 -value 0
 write_source_data -instance_index $ISSP_INDEX_0 -value 0x0 -value_in_hex
 after $RESET_MS
-write_source_data -instance_index $ISSP_INDEX_0 -value 0x2 -value_in_hex
-
+write_source_data -instance_index $ISSP_INDEX_0 -value 0x3 -value_in_hex

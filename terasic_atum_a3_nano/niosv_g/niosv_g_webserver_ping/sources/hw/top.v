@@ -107,6 +107,7 @@ wire        set_10;
 wire        set_1000;     
 wire        eth_mode;     
 wire        ena_10;       
+reg  [15:0] rgmii_rxclk_count;
 
 wire    [31: 0]   dram_data_out;
 wire    [31: 0]   dram_data_in;
@@ -130,7 +131,6 @@ reset_release reset_release_0 (
 //// Reset assignments- comment 2
 //// -------------------------------------------------------------------------
 assign global_reset_n = ~init_done_n;
-assign PHY_RESET_N    = global_reset_n;
 
 buf b0 (mdio_in,MDIO);
 bufif1 b1 (MDIO,mdio_out,~mdio_oen);
@@ -152,8 +152,16 @@ assign global_reset = ~sys_pll_locked;
 
 issp issp_rst (
 .source ({phy_resetn,set_1000}),
-.probe ({eth_mode, ena_10})
+.probe ({rgmii_rxclk_count, eth_mode, ena_10})
 );
+
+always @(posedge rgmii_rxclk or posedge global_reset) begin
+	if (global_reset) begin
+		rgmii_rxclk_count <= 16'd0;
+	end else begin
+		rgmii_rxclk_count <= rgmii_rxclk_count + 16'd1;
+	end
+end
 
 
 	
@@ -207,5 +215,3 @@ qsys_top qsys_top_0 (
 
 
 endmodule 
-
-
