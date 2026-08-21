@@ -9,7 +9,7 @@ This example design includes a Nios® V/g processor connected to the On Chip RAM
 The objective of the design is to accomplish data transfer between the processor and on chip memory and toggling the on board LEDs with and without using the Push Button. 
 
 
-![image](https://github.com/altera-fpga/agilex3-ed-niosv/blob/rel/26.1.1/niosv_g/Baseline_Design/img/Baseline_Design_block_design.png)
+![image](https://github.com/altera-fpga/agilex3-ed-niosv/blob/rel/26.1.1/niosv_g/niosv_g_baseline_design/img/baseline_design_block_design.png)
 
 ## Project Details
 
@@ -22,13 +22,13 @@ The objective of the design is to accomplish data transfer between the processor
 * **Device Part**: A3CZ135BB18AE7S
 * **Design Package**: atum_niosv_g_Baseline_Design.zip
 * **Category**: Nios V
-* **URL**: https://github.com/altera-fpga/agilex3-ed-niosv/blob/rel/26.1.1/niosv_g/Baseline_Design
-* **downloadURL**: https://github.com/altera-fpga/agilex3-ed-niosv/releases/download/26.1.1/atum_niosv_g_Baseline_Design.zip
+* **URL**: https://github.com/altera-fpga/agilex3-ed-niosv/blob/rel/26.1.1/niosv_g/niosv_g_baseline_design
+* **downloadURL**: https://github.com/altera-fpga/agilex3-ed-niosv/releases/download/26.1.1/atum_niosv_g_baseline_design.zip
 
 ## Documentation
 
 * **Title**: Design Document
-* **URL**: https://github.com/altera-fpga/agilex3-ed-niosv/blob/rel/26.1.1/niosv_g/Baseline_Design/docs/Niosvg_processor_Baseline_Design_on_Atum_A3_Nano_FPGA.md
+* **URL**: https://github.com/altera-fpga/agilex3-ed-niosv/blob/rel/26.1.1/niosv_g/niosv_g_baseline_design/docs/Niosvg_processor_Baseline_Design_on_Atum_A3_Nano_FPGA.md
 
 # Getting Started
 
