@@ -9,7 +9,7 @@ This example design includes a Nios® V/g processor connected to the On Chip RAM
 The objective of the design is to accomplish data transfer between the processor and on chip memory and toggling the on board LEDs with and without using the Push Button. 
 
 
-![image](https://github.com/altera-fpga/agilex3-ed-niosv/blob/rel/26.1.1/niosv_g/niosv_g_baseline_design/img/baseline_design_block_design.png)
+![image](https://github.com/altera-fpga/agilex3-ed-niosv/blob/rel/26.1.1/terasic_atum_a3_nano/niosv_g/niosv_g_baseline_design/img/baseline_design_block_design.png)
 
 ## Project Details
 
